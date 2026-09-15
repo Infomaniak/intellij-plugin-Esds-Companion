@@ -15,6 +15,17 @@ EsdsTheme.icon.|
                 sizeXl      40dp
 ```
 
+## Inlay hints (optional)
+
+The same values can be shown inline, right at each call site:
+
+```kotlin
+Box(Modifier.padding(EsdsTheme.spacing.md 8dp))
+```
+
+This is **off by default**. Each developer turns it on for themselves under
+**Settings → Editor → Inlay Hints → Values → _Infomaniak design system token values_**.
+
 Supported token groups:
 
 | Accessor             | Example                      | Shown |
@@ -70,6 +81,16 @@ diverging from the default one, the values here would need a per-theme strategy 
 
 ## How it works
 
+### Inlay hints
+
+`EsdsTokenInlayHintsProvider` is a *declarative* inlay provider, which is what gives the per-user
+on/off switch in Settings for free — no custom settings UI is needed. It matches whole
+`SomeTheme.category.token` expressions; a nested receiver such as `EsdsTheme.icon` is a
+dot-qualified expression too, but it is not a complete token reference, so no hint is emitted twice
+for the same expression.
+
+### Code completion
+
 `EsdsTokenCompletionContributor` is registered with `order="first"`, calls
 `runRemainingContributors` to intercept the items produced by the Kotlin plugin, and re-renders the
 matching ones with the token value as type text.
@@ -98,8 +119,10 @@ member is left alone. The trade-off: aliasing the receiver into a local variable
 ./gradlew verifyPlugin                # compatibility check against the supported IDE range
 ```
 
-The integration test drives *real* Kotlin code completion against the bundled Kotlin plugin and
-asserts that `EsdsTheme.icon.si<caret>` renders `sizeSm` with `20dp`, which is what catches
-contributor-ordering regressions.
+The integration tests drive the *real* Kotlin completion and inlay hint passes against the bundled
+Kotlin plugin: they assert that `EsdsTheme.icon.si<caret>` renders `sizeSm` with `20dp`, and that
+`EsdsTheme.spacing.md` gets an `8dp` inlay. That is what catches contributor-ordering regressions.
+`PluginRegistrationTest` additionally checks the `plugin.xml` wiring, including that the settings
+labels resolve to real resource bundle entries.
 
 Bump `pluginVersion` in `gradle.properties` before sharing a new build.

@@ -12,6 +12,9 @@
         completion item. Works for <code>EsdsTheme.icon</code>, <code>EsdsTheme.spacing</code>
         and <code>EsdsTheme.radius</code>.
         <br/><br/>
+        Optionally, <b>inlay hints</b> can show the same values inline next to each call site.
+        Turn them on under <i>Settings | Editor | Inlay Hints | Values</i>.
+        <br/><br/>
         Values are generated from the design system's default theme; all app themes map these
         dimension tokens to the same primitives, so the displayed values are accurate everywhere.
     ]]></description>
@@ -33,5 +36,20 @@
                 language="kotlin"
                 order="first"
                 implementationClass="com.infomaniak.dstokeninfo.EsdsTokenCompletionContributor"/>
+
+        <!--
+          Declarative inlay hints get a per-user on/off switch for free, under
+          Settings | Editor | Inlay Hints. Disabled by default so the plugin stays unobtrusive
+          until someone opts in.
+        -->
+        <codeInsight.declarativeInlayProvider
+                language="kotlin"
+                providerId="com.infomaniak.dstokeninfo.tokenValues"
+                group="VALUES_GROUP"
+                isEnabledByDefault="false"
+                bundle="messages.DsTokenInfoBundle"
+                nameKey="inlay.esdsTokenValues.name"
+                descriptionKey="inlay.esdsTokenValues.description"
+                implementationClass="com.infomaniak.dstokeninfo.EsdsTokenInlayHintsProvider"/>
     </extensions>
 </idea-plugin>

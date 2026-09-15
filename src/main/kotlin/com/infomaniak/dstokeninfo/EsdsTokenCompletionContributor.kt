@@ -17,7 +17,7 @@ class EsdsTokenCompletionContributor : CompletionContributor() {
         val file = parameters.originalFile
         if (!file.name.endsWith(".kt") && !file.name.endsWith(".kts")) return
 
-        val category = EsdsReceiverDetector.detectCategory(file.viewProvider.contents, parameters.offset) ?: return
+        val category = EsdsTokenMatcher.detectCategoryBeforeCaret(file.viewProvider.contents, parameters.offset) ?: return
 
         // Taking over the remaining contributors is the only way to decorate items we do
         // not produce ourselves. Every result is passed along, decorated or not.

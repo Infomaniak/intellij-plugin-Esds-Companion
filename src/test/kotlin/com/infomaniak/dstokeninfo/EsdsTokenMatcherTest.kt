@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 
-class EsdsReceiverDetectorTest {
+class EsdsTokenMatcherTest {
 
     private fun detect(code: String): String? = detectAtCaret(code)
 
@@ -12,7 +12,7 @@ class EsdsReceiverDetectorTest {
     private fun detectAtCaret(code: String): String? {
         val offset = code.indexOf('|')
         require(offset >= 0) { "Missing caret marker" }
-        return EsdsReceiverDetector.detectCategory(code.replace("|", ""), offset)
+        return EsdsTokenMatcher.detectCategoryBeforeCaret(code.replace("|", ""), offset)
     }
 
     @Test
@@ -66,5 +66,25 @@ class EsdsReceiverDetectorTest {
         assertEquals("8dp", EsdsTokenValues.valueOf("spacing", "md"))
         assertEquals("full", EsdsTokenValues.valueOf("radius", "full"))
         assertNull(EsdsTokenValues.valueOf("icon", "md"))
+    }
+
+    @Test
+    fun `resolves a whole token expression`() {
+        assertEquals("20dp", EsdsTokenMatcher.resolveExpression("EsdsTheme.icon.sizeSm"))
+        assertEquals("12dp", EsdsTokenMatcher.resolveExpression("EsdsTheme.spacing.lg"))
+        assertEquals("40dp", EsdsTokenMatcher.resolveExpression("MailTheme.icon.sizeXl"))
+    }
+
+    @Test
+    fun `tolerates line breaks inside a token expression`() {
+        assertEquals("8dp", EsdsTokenMatcher.resolveExpression("EsdsTheme\n    .spacing\n    .md"))
+    }
+
+    @Test
+    fun `does not resolve partial or unrelated expressions`() {
+        assertNull(EsdsTokenMatcher.resolveExpression("EsdsTheme.icon"))
+        assertNull(EsdsTokenMatcher.resolveExpression("EsdsTheme.icon.unknown"))
+        assertNull(EsdsTokenMatcher.resolveExpression("binding.icon.sizeSm"))
+        assertNull(EsdsTokenMatcher.resolveExpression("foo(EsdsTheme.icon.sizeSm)"))
     }
 }
