@@ -1,26 +1,37 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
     <id>com.infomaniak.DsTokenInfoPlugin</id>
+    <name>Infomaniak Design System Token Info</name>
+    <vendor url="https://github.com/Infomaniak/android-design-system">Infomaniak</vendor>
 
-    <!-- Public plugin name should be written in Title Case.
-     Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
-    <name>DsTokenInfoPlugin</name>
-
-    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor url="https://www.yourcompany.com">YourCompany</vendor>
-
-    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
-         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
-        Example of a plugin that is ready to work in a distributed environment.<br>
-        <em>Plugin is supposed to be installed into both frontend and backend IDE,
-        the set of features to be available is determined by their registration in either backend or frontend-specific XML descriptor files</em>
+        Shows the real value of <b>Infomaniak design system</b> tokens directly in code completion.
+        <br/><br/>
+        Instead of the uninformative <code>Dp</code> type, completing
+        <code>EsdsTheme.icon.sizeSm</code> displays <code>20dp</code> on the right of the
+        completion item. Works for <code>EsdsTheme.icon</code>, <code>EsdsTheme.spacing</code>
+        and <code>EsdsTheme.radius</code>.
+        <br/><br/>
+        Values are generated from the design system's default theme; all app themes map these
+        dimension tokens to the same primitives, so the displayed values are accurate everywhere.
     ]]></description>
 
-    <content>
-        <module name="DsTokenInfoPlugin.shared" loading="required"/>
-        <module name="DsTokenInfoPlugin.frontend"/>
-        <module name="DsTokenInfoPlugin.backend"/>
-    </content>
+    <!-- Core platform only: the plugin works in Android Studio and every IntelliJ-based IDE. -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!--
+          Must be registered for `kotlin` specifically, NOT for `any`: the platform resolves
+          completion contributors with `allForLanguageOrAny`, which appends the `any`
+          contributors *after* all language-specific ones. An `any` contributor therefore runs
+          last, and `runRemainingContributors` would have nothing left to decorate.
+
+          `language="kotlin"` is a plain string key, so no dependency on the Kotlin plugin is
+          needed; the extension simply never matches if that plugin is absent.
+        -->
+        <completion.contributor
+                language="kotlin"
+                order="first"
+                implementationClass="com.infomaniak.dstokeninfo.EsdsTokenCompletionContributor"/>
+    </extensions>
 </idea-plugin>
