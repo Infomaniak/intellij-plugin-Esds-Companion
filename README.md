@@ -26,6 +26,9 @@ Box(Modifier.padding(EsdsTheme.spacing.md 8dp))
 This is **off by default**. Each developer turns it on for themselves under
 **Settings → Editor → Inlay Hints → Values → _Infomaniak design system token values_**.
 
+Hints are clickable: **Ctrl-click** (**Cmd-click** on macOS) one to open the design system file that
+defines the token — see [Jumping to the definition](#jumping-to-the-definition).
+
 Supported token groups:
 
 | Accessor             | Example                      | Shown |
@@ -89,6 +92,26 @@ on/off switch in Settings for free — no custom settings UI is needed. It match
 dot-qualified expression too, but it is not a complete token reference, so no hint is emitted twice
 for the same expression.
 
+### Jumping to the definition
+
+Clicking a hint opens the file that states what the token is worth. The design system reaches the
+literal through three files, so `EsdsTokenNavigator` looks for the closest one available in the
+project and falls back outwards:
+
+| # | File | Line matched | Why |
+|---|------|--------------|-----|
+| 1 | `DefaultIconTokens.kt` | `sizeSm = IntermediateDefault.IconSizeSm` | where the token is assigned a value |
+| 2 | `IntermediateDefault.kt` | `val IconSizeSm = Scale20` | if the app only depends on the intermediate layer |
+| 3 | `ScalePrimitiveTokens.kt` | `val Scale20 = 20.dp` | last resort: the raw literal |
+
+Files are found through the core `FilenameIndex` and scanned with a regex, again to avoid depending
+on the Kotlin plugin's PSI. The assignment pattern is guarded with `(?<![.\w])` so that searching for
+`md` in `DefaultSpacingTokens.kt` matches the `md =` on the left-hand side and not the
+`IntermediateDefault.SpacingMd` on the right.
+
+The lookup runs on click, not while hints are being built, because the hints pass re-runs on every
+keystroke.
+
 ### Code completion
 
 `EsdsTokenCompletionContributor` is registered with `order="first"`, calls
@@ -123,6 +146,8 @@ The integration tests drive the *real* Kotlin completion and inlay hint passes a
 Kotlin plugin: they assert that `EsdsTheme.icon.si<caret>` renders `sizeSm` with `20dp`, and that
 `EsdsTheme.spacing.md` gets an `8dp` inlay. That is what catches contributor-ordering regressions.
 `PluginRegistrationTest` additionally checks the `plugin.xml` wiring, including that the settings
-labels resolve to real resource bundle entries.
+labels resolve to real resource bundle entries and that the click handler is registered under the id
+the hints reference. `EsdsTokenNavigatorTest` runs the definition lookup against verbatim copies of
+the real design system files.
 
 Bump `pluginVersion` in `gradle.properties` before sharing a new build.

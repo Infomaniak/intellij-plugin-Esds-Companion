@@ -68,16 +68,27 @@ class EsdsTokenMatcherTest {
         assertNull(EsdsTokenValues.valueOf("icon", "md"))
     }
 
+    private fun resolvedValue(expression: String): String? =
+        EsdsTokenMatcher.resolveExpression(expression)?.value?.value
+
     @Test
     fun `resolves a whole token expression`() {
-        assertEquals("20dp", EsdsTokenMatcher.resolveExpression("EsdsTheme.icon.sizeSm"))
-        assertEquals("12dp", EsdsTokenMatcher.resolveExpression("EsdsTheme.spacing.lg"))
-        assertEquals("40dp", EsdsTokenMatcher.resolveExpression("MailTheme.icon.sizeXl"))
+        assertEquals("20dp", resolvedValue("EsdsTheme.icon.sizeSm"))
+        assertEquals("12dp", resolvedValue("EsdsTheme.spacing.lg"))
+        assertEquals("40dp", resolvedValue("MailTheme.icon.sizeXl"))
+    }
+
+    @Test
+    fun `reports the category and token it resolved`() {
+        val reference = EsdsTokenMatcher.resolveExpression("EsdsTheme.icon.sizeSm")
+
+        assertEquals("icon", reference?.category)
+        assertEquals("sizeSm", reference?.token)
     }
 
     @Test
     fun `tolerates line breaks inside a token expression`() {
-        assertEquals("8dp", EsdsTokenMatcher.resolveExpression("EsdsTheme\n    .spacing\n    .md"))
+        assertEquals("8dp", resolvedValue("EsdsTheme\n    .spacing\n    .md"))
     }
 
     @Test

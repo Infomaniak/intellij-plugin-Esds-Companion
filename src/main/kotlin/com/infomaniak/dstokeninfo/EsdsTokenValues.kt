@@ -9,45 +9,70 @@ package com.infomaniak.dstokeninfo
  */
 internal object EsdsTokenValues {
 
-    val categories: Map<String, Map<String, String>> = mapOf(
+    /**
+     * @param value the resolved dimension, e.g. `20dp`.
+     * @param declarationName the property declaring this token in `IntermediateDefault`,
+     *   e.g. `IconSizeSm`.
+     * @param primitiveName the primitive holding the literal, e.g. `Scale20`.
+     * @param primitiveFileName the file declaring [primitiveName].
+     */
+    data class Token(
+        val value: String,
+        val declarationName: String,
+        val primitiveName: String,
+        val primitiveFileName: String,
+    )
+
+    const val DECLARATION_FILE_NAME: String = "IntermediateDefault.kt"
+
+    /** File assigning the tokens of a category, e.g. `sizeSm = ...` in the icon one. */
+    val categoryFileNames: Map<String, String> = mapOf(
+        "icon" to "DefaultIconTokens.kt",
+        "spacing" to "DefaultSpacingTokens.kt",
+        "radius" to "DefaultRadiusTokens.kt",
+    )
+
+    val categories: Map<String, Map<String, Token>> = mapOf(
         "icon" to mapOf(
-            "sizeXs" to "16dp",
-            "sizeMd" to "24dp",
-            "sizeLg" to "32dp",
-            "sizeSm" to "20dp",
-            "sizeXl" to "40dp",
+            "sizeXs" to Token("16dp", "IconSizeXs", "Scale16", "ScalePrimitiveTokens.kt"),
+            "sizeMd" to Token("24dp", "IconSizeMd", "Scale24", "ScalePrimitiveTokens.kt"),
+            "sizeLg" to Token("32dp", "IconSizeLg", "Scale32", "ScalePrimitiveTokens.kt"),
+            "sizeSm" to Token("20dp", "IconSizeSm", "Scale20", "ScalePrimitiveTokens.kt"),
+            "sizeXl" to Token("40dp", "IconSizeXl", "Scale40", "ScalePrimitiveTokens.kt"),
         ),
         "spacing" to mapOf(
-            "none" to "0dp",
-            "twoXs" to "2dp",
-            "xs" to "4dp",
-            "sm" to "6dp",
-            "md" to "8dp",
-            "lg" to "12dp",
-            "xl" to "16dp",
-            "twoXl" to "20dp",
-            "threeXl" to "24dp",
-            "fourXl" to "32dp",
-            "fiveXl" to "40dp",
-            "sixXl" to "48dp",
-            "sevenXl" to "64dp",
-            "eightXl" to "100dp",
+            "none" to Token("0dp", "SpacingNone", "Spacing0", "SpacingPrimitiveTokens.kt"),
+            "twoXs" to Token("2dp", "Spacing2xs", "Spacing2", "SpacingPrimitiveTokens.kt"),
+            "xs" to Token("4dp", "SpacingXs", "Spacing4", "SpacingPrimitiveTokens.kt"),
+            "sm" to Token("6dp", "SpacingSm", "Spacing6", "SpacingPrimitiveTokens.kt"),
+            "md" to Token("8dp", "SpacingMd", "Spacing8", "SpacingPrimitiveTokens.kt"),
+            "lg" to Token("12dp", "SpacingLg", "Spacing12", "SpacingPrimitiveTokens.kt"),
+            "xl" to Token("16dp", "SpacingXl", "Spacing16", "SpacingPrimitiveTokens.kt"),
+            "twoXl" to Token("20dp", "Spacing2xl", "Spacing20", "SpacingPrimitiveTokens.kt"),
+            "threeXl" to Token("24dp", "Spacing3xl", "Spacing24", "SpacingPrimitiveTokens.kt"),
+            "fourXl" to Token("32dp", "Spacing4xl", "Spacing32", "SpacingPrimitiveTokens.kt"),
+            "fiveXl" to Token("40dp", "Spacing5xl", "Spacing40", "SpacingPrimitiveTokens.kt"),
+            "sixXl" to Token("48dp", "Spacing6xl", "Spacing48", "SpacingPrimitiveTokens.kt"),
+            "sevenXl" to Token("64dp", "Spacing7xl", "Spacing64", "SpacingPrimitiveTokens.kt"),
+            "eightXl" to Token("100dp", "Spacing8xl", "Spacing100", "SpacingPrimitiveTokens.kt"),
         ),
         "radius" to mapOf(
-            "none" to "0dp",
-            "xs" to "2dp",
-            "sm" to "4dp",
-            "md" to "6dp",
-            "lg" to "8dp",
-            "xl" to "12dp",
-            "twoXl" to "16dp",
-            "threeXl" to "24dp",
-            "fourXl" to "32dp",
-            "full" to "full",
+            "none" to Token("0dp", "RadiusNone", "Radius0", "RadiusPrimitiveTokens.kt"),
+            "xs" to Token("2dp", "RadiusXs", "Radius2", "RadiusPrimitiveTokens.kt"),
+            "sm" to Token("4dp", "RadiusSm", "Radius4", "RadiusPrimitiveTokens.kt"),
+            "md" to Token("6dp", "RadiusMd", "Radius6", "RadiusPrimitiveTokens.kt"),
+            "lg" to Token("8dp", "RadiusLg", "Radius8", "RadiusPrimitiveTokens.kt"),
+            "xl" to Token("12dp", "RadiusXl", "Radius12", "RadiusPrimitiveTokens.kt"),
+            "twoXl" to Token("16dp", "Radius2xl", "Radius16", "RadiusPrimitiveTokens.kt"),
+            "threeXl" to Token("24dp", "Radius3xl", "Radius24", "RadiusPrimitiveTokens.kt"),
+            "fourXl" to Token("32dp", "Radius4xl", "Radius32", "RadiusPrimitiveTokens.kt"),
+            "full" to Token("full", "RadiusFull", "Radius1000", "RadiusPrimitiveTokens.kt"),
         ),
     )
 
     val knownCategories: Set<String> = categories.keys
 
-    fun valueOf(category: String, token: String): String? = categories[category]?.get(token)
+    fun tokenOf(category: String, token: String): Token? = categories[category]?.get(token)
+
+    fun valueOf(category: String, token: String): String? = tokenOf(category, token)?.value
 }

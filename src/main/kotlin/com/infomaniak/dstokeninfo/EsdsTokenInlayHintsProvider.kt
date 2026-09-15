@@ -1,6 +1,7 @@
 package com.infomaniak.dstokeninfo
 
 import com.intellij.codeInsight.hints.declarative.HintFormat
+import com.intellij.codeInsight.hints.declarative.InlayActionData
 import com.intellij.codeInsight.hints.declarative.InlayHintsCollector
 import com.intellij.codeInsight.hints.declarative.InlayHintsProvider
 import com.intellij.codeInsight.hints.declarative.InlayTreeSink
@@ -13,7 +14,9 @@ import com.intellij.psi.PsiFile
 /**
  * Shows the value of a design system token inline, next to its call site:
  *
- *     Modifier.padding(EsdsTheme.spacing.md)  ->  Modifier.padding(EsdsTheme.spacing.md: 8dp)
+ *     Modifier.padding(EsdsTheme.spacing.md)  ->  Modifier.padding(EsdsTheme.spacing.md 8dp)
+ *
+ * Clicking a hint navigates to the design system source that defines the value.
  *
  * Users switch this on and off per-IDE under
  * *Settings | Editor | Inlay Hints | Values | Infomaniak design system token values*.
@@ -32,13 +35,19 @@ internal class EsdsTokenInlayHintsProvider : InlayHintsProvider {
             // A nested receiver such as `EsdsTheme.icon` is a dot-qualified expression too, but
             // it is not a complete token reference, so it never matches and no hint is emitted
             // twice for the same expression.
-            val value = EsdsTokenMatcher.resolveExpression(element.text) ?: return
+            val reference = EsdsTokenMatcher.resolveExpression(element.text) ?: return
+
+            // Clicking the hint jumps to the design system source defining the value.
+            val navigation = InlayActionData(
+                EsdsTokenNavigationHandler.payloadFor(reference.category, reference.token),
+                EsdsTokenNavigationHandler.HANDLER_ID,
+            )
 
             sink.addPresentation(
                 position = InlineInlayPosition(element.textRange.endOffset, relatedToPrevious = true),
                 hintFormat = HintFormat.default,
             ) {
-                text(value)
+                text(reference.value.value, navigation)
             }
         }
     }

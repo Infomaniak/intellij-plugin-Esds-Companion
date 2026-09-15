@@ -5,7 +5,8 @@ import com.intellij.testFramework.utils.inlays.declarative.DeclarativeInlayHints
 
 /**
  * Runs the real inlay hints pass over Kotlin code. Expected hints are written inline with the
- * platform's `/*<# ... #>*/` markers.
+ * platform's `/*<# ... #>*/` markers, where `[payload:handlerId]` is the click action attached to
+ * the hint, so these tests also pin down what clicking a hint will navigate to.
  */
 class EsdsTokenInlayHintsProviderTest : DeclarativeInlayHintsProviderTestCase() {
 
@@ -22,9 +23,9 @@ class EsdsTokenInlayHintsProviderTest : DeclarativeInlayHintsProviderTestCase() 
         doTest(
             """
             fun screen() {
-                val iconSize = EsdsTheme.icon.sizeSm/*<# 20dp #>*/
-                val padding = EsdsTheme.spacing.md/*<# 8dp #>*/
-                val shape = EsdsTheme.radius.full/*<# full #>*/
+                val iconSize = EsdsTheme.icon.sizeSm/*<# [icon/sizeSm:com.infomaniak.dstokeninfo.navigateToToken]20dp #>*/
+                val padding = EsdsTheme.spacing.md/*<# [spacing/md:com.infomaniak.dstokeninfo.navigateToToken]8dp #>*/
+                val shape = EsdsTheme.radius.full/*<# [radius/full:com.infomaniak.dstokeninfo.navigateToToken]full #>*/
             }
             """.trimIndent(),
         )
@@ -34,7 +35,7 @@ class EsdsTokenInlayHintsProviderTest : DeclarativeInlayHintsProviderTestCase() 
         doTest(
             """
             fun screen() {
-                Box(Modifier.padding(EsdsTheme.spacing.lg/*<# 12dp #>*/))
+                Box(Modifier.padding(EsdsTheme.spacing.lg/*<# [spacing/lg:com.infomaniak.dstokeninfo.navigateToToken]12dp #>*/))
             }
             """.trimIndent(),
         )
@@ -44,7 +45,7 @@ class EsdsTokenInlayHintsProviderTest : DeclarativeInlayHintsProviderTestCase() 
         doTest(
             """
             fun screen() {
-                val iconSize = MailTheme.icon.sizeXl/*<# 40dp #>*/
+                val iconSize = MailTheme.icon.sizeXl/*<# [icon/sizeXl:com.infomaniak.dstokeninfo.navigateToToken]40dp #>*/
             }
             """.trimIndent(),
         )

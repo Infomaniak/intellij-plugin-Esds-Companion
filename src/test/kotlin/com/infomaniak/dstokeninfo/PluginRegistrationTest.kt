@@ -54,6 +54,14 @@ class PluginRegistrationTest {
         }
     }
 
+    @Test
+    fun `inlay click handler is registered with the id used by the hints`() {
+        val registration = extension("codeInsight.inlayActionHandler")
+
+        assertEquals(EsdsTokenNavigationHandler.HANDLER_ID, registration.attribute("handlerId"))
+        assertClassExists(registration.attribute("implementationClass"))
+    }
+
     private fun extension(name: String): String {
         val tag = Regex("""<$name\b[^>]*/>""", RegexOption.DOT_MATCHES_ALL).find(pluginXml)
         return checkNotNull(tag) { "No <$name> registration in plugin.xml" }.value

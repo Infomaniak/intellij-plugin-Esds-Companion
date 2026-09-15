@@ -44,16 +44,20 @@ internal object EsdsTokenMatcher {
         return category.takeIf { it in EsdsTokenValues.knownCategories }
     }
 
+    /** A resolved token reference: which category and token it is, and its value. */
+    data class Reference(val category: String, val token: String, val value: EsdsTokenValues.Token)
+
     /**
-     * Resolves a whole token reference to its value, e.g. `EsdsTheme.icon.sizeSm` -> `20dp`.
+     * Resolves a whole token reference, e.g. `EsdsTheme.icon.sizeSm` -> `20dp`.
      * Returns `null` when [expression] is not a design system token reference.
      */
-    fun resolveExpression(expression: CharSequence): String? {
+    fun resolveExpression(expression: CharSequence): Reference? {
         val match = EXPRESSION_REGEX.matchEntire(expression) ?: return null
 
         val (theme, category, token) = match.destructured
         if (!theme.endsWith(THEME_SUFFIX)) return null
 
-        return EsdsTokenValues.valueOf(category, token)
+        val value = EsdsTokenValues.tokenOf(category, token) ?: return null
+        return Reference(category, token, value)
     }
 }

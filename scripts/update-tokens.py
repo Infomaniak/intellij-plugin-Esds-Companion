@@ -45,6 +45,11 @@ PRIMITIVE_FILES = [
 
 INTERMEDIATE = f"{FOUNDATION}/defaultvalues/internal/IntermediateDefault.kt"
 
+# File and object declaring every default token value, used as the navigation target when a
+# user clicks an inlay hint.
+DECLARATION_FILE_NAME = INTERMEDIATE.rsplit("/", 1)[-1]
+DECLARATION_OBJECT = DECLARATION_FILE_NAME.removesuffix(".kt")
+
 VAL_RE = re.compile(r"^\s*val\s+(\w+)\s*:\s*\w+\s*=\s*(.+?)\s*$", re.MULTILINE)
 ASSIGN_RE = re.compile(r"^\s*(\w+)\s*=\s*IntermediateDefault\.(\w+)\s*,\s*$", re.MULTILINE)
 
@@ -95,17 +100,21 @@ def main() -> int:
     args = parser.parse_args()
 
     primitives: dict[str, str] = {}
+    primitive_files: dict[str, str] = {}
     for path in PRIMITIVE_FILES:
         for name, expression in VAL_RE.findall(fetch(path, args.ref)):
             primitives[name] = render_primitive(expression)
+            primitive_files[name] = path.rsplit("/", 1)[-1]
 
     intermediate: dict[str, str] = {}
     for name, expression in VAL_RE.findall(fetch(INTERMEDIATE, args.ref)):
         intermediate[name] = expression.strip()
 
-    categories: dict[str, dict[str, str]] = {}
+    categories: dict[str, dict[str, tuple[str, str, str, str]]] = {}
+    category_files: dict[str, str] = {}
     for category, path in CATEGORIES.items():
-        tokens: dict[str, str] = {}
+        category_files[category] = path.rsplit("/", 1)[-1]
+        tokens: dict[str, tuple[str, str, str, str]] = {}
         for prop, intermediate_name in ASSIGN_RE.findall(fetch(path, args.ref)):
             primitive = intermediate.get(intermediate_name)
             if primitive is None:
@@ -113,7 +122,10 @@ def main() -> int:
             value = primitives.get(primitive)
             if value is None:
                 raise SystemExit(f"Unknown primitive {primitive} for {category}.{prop}")
-            tokens[prop] = value
+            # Both declaration sites are recorded so clicking an inlay hint can navigate to
+            # the design system sources: the default theme mapping first, and the primitive
+            # holding the literal (`Scale20 = 20.dp`) as a fallback.
+            tokens[prop] = (value, intermediate_name, primitive, primitive_files[primitive])
         if not tokens:
             raise SystemExit(f"No tokens parsed for category '{category}' from {path}")
         categories[category] = tokens
@@ -130,19 +142,48 @@ def main() -> int:
         " */",
         "internal object EsdsTokenValues {",
         "",
-        "    val categories: Map<String, Map<String, String>> = mapOf(",
+        "    /**",
+        "     * @param value the resolved dimension, e.g. `20dp`.",
+        f"     * @param declarationName the property declaring this token in `{DECLARATION_OBJECT}`,",
+        "     *   e.g. `IconSizeSm`.",
+        "     * @param primitiveName the primitive holding the literal, e.g. `Scale20`.",
+        "     * @param primitiveFileName the file declaring [primitiveName].",
+        "     */",
+        "    data class Token(",
+        "        val value: String,",
+        "        val declarationName: String,",
+        "        val primitiveName: String,",
+        "        val primitiveFileName: String,",
+        "    )",
+        "",
+        f'    const val DECLARATION_FILE_NAME: String = "{DECLARATION_FILE_NAME}"',
+        "",
+        "    /** File assigning the tokens of a category, e.g. `sizeSm = ...` in the icon one. */",
+        "    val categoryFileNames: Map<String, String> = mapOf(",
+    ]
+    for category, file_name in category_files.items():
+        lines.append(f'        "{category}" to "{file_name}",')
+    lines += [
+        "    )",
+        "",
+        "    val categories: Map<String, Map<String, Token>> = mapOf(",
     ]
     for category, tokens in categories.items():
         lines.append(f'        "{category}" to mapOf(')
-        for prop, value in tokens.items():
-            lines.append(f'            "{prop}" to "{value}",')
+        for prop, (value, declaration, primitive, primitive_file) in tokens.items():
+            lines.append(
+                f'            "{prop}" to Token("{value}", "{declaration}", '
+                f'"{primitive}", "{primitive_file}"),'
+            )
         lines.append("        ),")
     lines += [
         "    )",
         "",
         "    val knownCategories: Set<String> = categories.keys",
         "",
-        "    fun valueOf(category: String, token: String): String? = categories[category]?.get(token)",
+        "    fun tokenOf(category: String, token: String): Token? = categories[category]?.get(token)",
+        "",
+        "    fun valueOf(category: String, token: String): String? = tokenOf(category, token)?.value",
         "}",
         "",
     ]

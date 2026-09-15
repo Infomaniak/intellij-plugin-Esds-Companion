@@ -51,5 +51,10 @@
                 nameKey="inlay.esdsTokenValues.name"
                 descriptionKey="inlay.esdsTokenValues.description"
                 implementationClass="com.infomaniak.dstokeninfo.EsdsTokenInlayHintsProvider"/>
+
+        <!-- Makes the inlay hints clickable: jumps to the design system source. -->
+        <codeInsight.inlayActionHandler
+                handlerId="com.infomaniak.dstokeninfo.navigateToToken"
+                implementationClass="com.infomaniak.dstokeninfo.EsdsTokenNavigationHandler"/>
     </extensions>
 </idea-plugin>
