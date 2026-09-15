@@ -62,6 +62,18 @@ class EsdsTokenNavigatorTest : BasePlatformTestCase() {
         assertEquals("  md = IntermediateDefault.SpacingMd,", targetLine(target, DEFAULT_SPACING_TOKENS))
     }
 
+    /**
+     * The virtual file must be carried over as-is: rebuilding a `file://` URL from its path breaks
+     * as soon as the design system comes from a library, where sources live inside a jar.
+     */
+    fun `test reports the file it found rather than a path`() {
+        val file = myFixture.addFileToProject("DefaultIconTokens.kt", DEFAULT_ICON_TOKENS).virtualFile
+
+        val target = checkNotNull(findDefinition("icon", "sizeSm"))
+
+        assertEquals(file, target.file)
+    }
+
     fun `test resolves nothing when the design system is not in the project`() {
         assertNull(findDefinition("icon", "sizeSm"))
     }

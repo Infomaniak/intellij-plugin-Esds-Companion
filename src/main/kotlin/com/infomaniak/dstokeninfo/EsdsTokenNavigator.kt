@@ -1,6 +1,7 @@
 package com.infomaniak.dstokeninfo
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 
@@ -14,7 +15,11 @@ import com.intellij.psi.search.GlobalSearchScope
  */
 internal object EsdsTokenNavigator {
 
-    data class Target(val fileName: String, val offset: Int, val filePath: String)
+    /**
+     * [file] is kept as-is rather than as a path: the design system is usually a library, so the
+     * file lives inside a jar and cannot be reached back through a `file://` URL.
+     */
+    data class Target(val fileName: String, val offset: Int, val file: VirtualFile)
 
     /** How the searched property is written in the file declaring it. */
     private enum class Style {
@@ -60,7 +65,7 @@ internal object EsdsTokenNavigator {
         for (file in files) {
             val text = runCatching { String(file.contentsToByteArray(), file.charset) }.getOrNull() ?: continue
             val offset = regex.find(text)?.groups?.get(1)?.range?.first ?: continue
-            return Target(candidate.fileName, offset, file.path)
+            return Target(candidate.fileName, offset, file)
         }
         return null
     }

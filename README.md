@@ -110,7 +110,13 @@ on the Kotlin plugin's PSI. The assignment pattern is guarded with `(?<![.\w])` 
 `IntermediateDefault.SpacingMd` on the right.
 
 The lookup runs on click, not while hints are being built, because the hints pass re-runs on every
-keystroke.
+keystroke, and it runs off the EDT in smart mode, since querying the index and reading a file out of
+a jar are both slow operations.
+
+The file is then opened through the `VirtualFile` that was found, never through its path: the design
+system is usually a library, so the file sits inside a jar and a rebuilt `file://` URL resolves to
+nothing. When sources are unavailable altogether — Gradle source downloads turned off — the click
+reports it in the editor rather than silently doing nothing.
 
 ### Code completion
 

@@ -3,29 +3,57 @@ package com.infomaniak.dstokeninfo
 import com.intellij.codeInsight.hints.declarative.InlayActionHandler
 import com.intellij.codeInsight.hints.declarative.InlayActionPayload
 import com.intellij.codeInsight.hints.declarative.StringInlayActionPayload
+import com.intellij.codeInsight.hint.HintManager
+import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.EditorMouseEvent
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
-import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.project.Project
+import com.intellij.util.concurrency.AppExecutorUtil
+import org.jetbrains.concurrency.CancellablePromise
 
 /**
  * Opens the design system source defining a token when its inlay hint is clicked.
  *
  * Resolving the file happens on click rather than while building the hint, because the lookup
- * hits the filename index and the hints pass runs on every edit.
+ * hits the filename index and the hints pass runs on every edit. It is then done off the EDT,
+ * since querying the index and reading a file out of a library jar are both slow operations.
  */
 internal class EsdsTokenNavigationHandler : InlayActionHandler {
 
     override fun handleClick(event: EditorMouseEvent, payload: InlayActionPayload) {
-        val project = event.editor.project ?: return
-        val reference = (payload as? StringInlayActionPayload)?.text ?: return
+        navigateTo(event.editor, payload)
+    }
 
-        val (category, tokenName) = split(reference) ?: return
-        val token = EsdsTokenValues.tokenOf(category, tokenName) ?: return
-        val target = EsdsTokenNavigator.findDefinition(project, category, tokenName, token) ?: return
-        val file = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl("file", target.filePath))
-            ?: return
+    /** Returns the pending lookup, so tests can await a click that is otherwise fire and forget. */
+    fun navigateTo(editor: Editor, payload: InlayActionPayload): CancellablePromise<*>? {
+        val project = editor.project ?: return null
+        val reference = (payload as? StringInlayActionPayload)?.text ?: return null
 
-        OpenFileDescriptor(project, file, target.offset).navigate(true)
+        val (category, tokenName) = split(reference) ?: return null
+        val token = EsdsTokenValues.tokenOf(category, tokenName) ?: return null
+
+        return ReadAction.nonBlocking<EsdsTokenNavigator.Target?> {
+            EsdsTokenNavigator.findDefinition(project, category, tokenName, token)
+        }
+            .inSmartMode(project)
+            .expireWhen { editor.isDisposed || project.isDisposed }
+            .finishOnUiThread(ModalityState.defaultModalityState()) { target ->
+                navigate(project, editor, target, "$category.$tokenName")
+            }
+            .submit(AppExecutorUtil.getAppExecutorService())
+    }
+
+    private fun navigate(project: Project, editor: Editor, target: EsdsTokenNavigator.Target?, token: String) {
+        if (target == null) {
+            // Doing nothing at all would just look like a broken hint, so explain why instead.
+            HintManager.getInstance()
+                .showErrorHint(editor, DsTokenInfoBundle.message("navigation.sourceNotFound", token))
+            return
+        }
+
+        OpenFileDescriptor(project, target.file, target.offset).navigate(true)
     }
 
     private fun split(reference: String): Pair<String, String>? {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+- Fix clicking an inlay hint doing nothing when the design system comes from a library: the target
+  file lives inside a jar, which the previous `file://` lookup could not reach.
+- Clicking a hint now reports why it cannot navigate instead of staying silent.
+
 ## 1.0.0
 
 - Show the resolved value of Infomaniak design system tokens in Kotlin code completion:
