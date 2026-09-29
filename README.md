@@ -39,16 +39,16 @@ digits with the token name, so `EsdsTheme.spacing.16` becomes `EsdsTheme.spacing
 The value also appears inline, next to each call site:
 
 ```kotlin
-Box(Modifier.padding(EsdsTheme.spacing.md 8dp))
+Box(Modifier.padding(EsdsTheme.spacing.md 8 dp))
 ```
 
-Inlay hints are **on by default**. To turn them off, go to
-**Settings → Editor → Inlay Hints → Values → _Infomaniak design system token values_**.
+Inlay hints are **on by default**. To turn them off, go to **Settings → Editor → Inlay Hints → Values → _Infomaniak
+design system token values_**.
 
 **Ctrl-click** (**Cmd-click** on macOS) a hint to open the design system source that defines the
 token, for example the `sizeSm = …` line in `DefaultIconTokens.kt`. This needs the design system's
-sources in your project. If navigation reports missing sources, enable
-*Settings → Build Tools → Gradle → Download sources* and re-sync.
+sources in your project. If navigation reports missing sources, enable *Settings → Build Tools → Gradle → Download
+sources* and re-sync.
 
 ### Supported tokens
 
@@ -143,11 +143,11 @@ Clicking a hint opens the file that states what the token is worth. The design s
 literal through three files, so `EsdsTokenNavigator` looks for the closest one available in the
 project and falls back outwards:
 
-| # | File | Line matched | Why |
-|---|------|--------------|-----|
-| 1 | `DefaultIconTokens.kt` | `sizeSm = IntermediateDefault.IconSizeSm` | where the token is assigned a value |
-| 2 | `IntermediateDefault.kt` | `val IconSizeSm = Scale20` | if the app only depends on the intermediate layer |
-| 3 | `ScalePrimitiveTokens.kt` | `val Scale20 = 20.dp` | last resort: the raw literal |
+| # | File                      | Line matched                              | Why                                               |
+|---|---------------------------|-------------------------------------------|---------------------------------------------------|
+| 1 | `DefaultIconTokens.kt`    | `sizeSm = IntermediateDefault.IconSizeSm` | where the token is assigned a value               |
+| 2 | `IntermediateDefault.kt`  | `val IconSizeSm = Scale20`                | if the app only depends on the intermediate layer |
+| 3 | `ScalePrimitiveTokens.kt` | `val Scale20 = 20.dp`                     | last resort: the raw literal                      |
 
 Files are found through the core `FilenameIndex` and scanned with a regex, again to avoid depending
 on the Kotlin plugin's PSI. The assignment pattern is guarded with `(?<![.\w])` so that searching for
@@ -176,8 +176,8 @@ release, in both K1 and K2 mode.
 
 The receiver must be a `*Theme` qualifier, so `EsdsTheme.spacing.md` and per-app wrappers such as
 `MailTheme.spacing.md` are decorated, while an unrelated API that happens to expose a `spacing`
-member is left alone. The trade-off: aliasing the receiver into a local variable
-(`val s = EsdsTheme.spacing`) is not detected.
+member is left alone. The trade-off: aliasing the receiver into a local variable (`val s = EsdsTheme.spacing`) is not
+detected.
 
 > **Note on registration:** the contributor must be registered for `language="kotlin"`, *not*
 > `language="any"`. The platform resolves contributors with `allForLanguageOrAny`, which appends the
@@ -196,3 +196,7 @@ files.
 ## License
 
 [GPL-3.0](LICENSE), like the Infomaniak design system.
+
+## Feedback
+
+This is mostly vibe coded as a quick useful plugin, any feedback is appreciated. 
