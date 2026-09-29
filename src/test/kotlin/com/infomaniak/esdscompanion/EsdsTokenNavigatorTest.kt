@@ -1,4 +1,4 @@
-package com.infomaniak.dstokeninfo
+package com.infomaniak.esdscompanion
 
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.BasePlatformTestCase

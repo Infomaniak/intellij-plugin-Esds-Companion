@@ -1,4 +1,4 @@
-package com.infomaniak.dstokeninfo
+package com.infomaniak.esdscompanion
 
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.PrefixMatcher

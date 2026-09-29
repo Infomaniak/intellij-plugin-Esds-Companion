@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0
+
+- Renamed to **Esds Companion**. The plugin ID changed to `com.infomaniak.esdscompanion`, so
+  uninstall the previous "Infomaniak Design System Token Info" plugin before installing this one.
+  The inlay hints setting also resets to off, because it is keyed by the renamed provider.
+- Released publicly under GPL-3.0.
+
 ## 1.1.0
 
 - Find a token by its value: typing `EsdsTheme.spacing.1` lists the spacings whose value starts with

@@ -1,4 +1,4 @@
-package com.infomaniak.dstokeninfo
+package com.infomaniak.esdscompanion
 
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.testFramework.LightProjectDescriptor

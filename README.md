@@ -1,10 +1,15 @@
-# Infomaniak Design System Token Info
+# Esds Companion
 
-An IntelliJ / **Android Studio** plugin that shows the *actual value* of
-[Infomaniak design system](https://github.com/Infomaniak/android-design-system) tokens directly in
-code completion.
+An Android Studio / IntelliJ plugin for the
+[Infomaniak Android design system](https://github.com/Infomaniak/android-design-system) (ESDS). It
+shows the real value behind dimension tokens while you write Kotlin, which the IDE can't do by
+itself.
 
-Instead of the useless `Dp` type on the right of the completion popup, you get the real dimension:
+## Features
+
+### Values in code completion
+
+The completion popup shows each token's actual dimension instead of the `Dp` type:
 
 ```
 EsdsTheme.icon.|
@@ -15,9 +20,9 @@ EsdsTheme.icon.|
                 sizeXl      40dp
 ```
 
-## Finding a token by its value
+### Find a token by its value
 
-When you know the dimension but not the token name, type the number instead:
+If you know the dimension but not the token name, type the number instead:
 
 ```
 EsdsTheme.spacing.1|              EsdsTheme.spacing.16|
@@ -26,80 +31,94 @@ EsdsTheme.spacing.1|              EsdsTheme.spacing.16|
                   eightXl  100dp
 ```
 
-Items are kept when their value **starts with** the digits, smallest first, and accepting one
-replaces the digits with the token name (`EsdsTheme.spacing.xl`). This works for every category —
-`icon`, `spacing`, `radius` and any added later.
+Tokens whose value **starts with** the digits are listed, smallest first. Picking one replaces the
+digits with the token name, so `EsdsTheme.spacing.16` becomes `EsdsTheme.spacing.xl`.
 
-## Inlay hints (optional)
+### Inlay hints (opt-in)
 
-The same values can be shown inline, right at each call site:
+The value can also appear inline, next to each call site:
 
 ```kotlin
 Box(Modifier.padding(EsdsTheme.spacing.md 8dp))
 ```
 
-This is **off by default**. Each developer turns it on for themselves under
+Inlay hints are **off by default**. To turn them on, go to
 **Settings → Editor → Inlay Hints → Values → _Infomaniak design system token values_**.
 
-Hints are clickable: **Ctrl-click** (**Cmd-click** on macOS) one to open the design system file that
-defines the token — see [Jumping to the definition](#jumping-to-the-definition).
+**Ctrl-click** (**Cmd-click** on macOS) a hint to open the design system source that defines the
+token, for example the `sizeSm = …` line in `DefaultIconTokens.kt`. This needs the design system's
+sources in your project. If navigation reports missing sources, enable
+*Settings → Build Tools → Gradle → Download sources* and re-sync.
 
-Supported token groups:
+### Supported tokens
 
-| Accessor             | Example                      | Shown |
-|----------------------|------------------------------|-------|
-| `EsdsTheme.icon`     | `EsdsTheme.icon.sizeSm`      | `20dp` |
-| `EsdsTheme.spacing`  | `EsdsTheme.spacing.md`       | `8dp` |
-| `EsdsTheme.radius`   | `EsdsTheme.radius.lg`        | `8dp` (`full` for the circle shape) |
+| Accessor            | Example                 | Shown                               |
+|---------------------|-------------------------|-------------------------------------|
+| `EsdsTheme.icon`    | `EsdsTheme.icon.sizeSm` | `20dp`                              |
+| `EsdsTheme.spacing` | `EsdsTheme.spacing.md`  | `8dp`                               |
+| `EsdsTheme.radius`  | `EsdsTheme.radius.lg`   | `8dp` (`full` for the circle shape) |
 
-## Installing / sharing with the team
+Per-app themes work too, as long as their name ends in `Theme` (`MailTheme.spacing.md`).
 
-1. Build the distributable:
-   ```bash
-   ./gradlew buildPlugin
-   ```
-   The zip lands in `build/distributions/DsTokenInfoPlugin-<version>.zip`.
-2. Share that zip (Slack, an internal share, or a GitHub release).
-3. Each teammate installs it in Android Studio via
-   **Settings → Plugins → ⚙ → Install Plugin from Disk…** and restarts.
+## Installation
 
-Compatible with Android Studio Meerkat (2024.3 / build 243) and newer — there is no upper bound, so
-the plugin keeps working after IDE upgrades. Compatibility is checked at build time with
-`./gradlew verifyPlugin`.
+Requires Android Studio Meerkat (2024.3, build 243) or any IntelliJ-based IDE of that version or
+newer. There is no upper version bound.
 
-## Where the values come from
+1. Download `EsdsCompanion-<version>.zip` from the Releases page, or [build it](#building).
+2. In the IDE, open **Settings → Plugins → ⚙ → Install Plugin from Disk…** and select the zip.
+3. Restart the IDE.
 
-The tokens are resolved through a Compose `CompositionLocal`
-(`EsdsTheme.LocalEsdsTheme`), so their value simply does not exist at edit time — the IDE cannot
-evaluate it. The values are therefore baked into the plugin.
+> **Upgrading from "Infomaniak Design System Token Info":** this is the same plugin under a new
+> name and plugin ID, so the IDE won't replace the old one. Uninstall the old plugin first, or both
+> will decorate your code.
 
-They are **not typed by hand**. `scripts/update-tokens.py` reads the design system's *default theme*
-straight from GitHub and follows the token indirection down to the primitive literal:
+## Limitations
+
+- **Values come from the default theme.** Tokens are provided through a Compose `CompositionLocal`,
+  so their values don't exist until runtime. The plugin ships values generated from the design
+  system's default theme. Every current app theme maps these tokens to the same values, but values
+  overridden locally with `CompositionLocalProvider` aren't reflected.
+- **Receivers are matched by text.** `EsdsTheme.spacing.md` is recognised, but a receiver stored in
+  a variable (`val s = EsdsTheme.spacing; s.md`) is not.
+- **Dimension tokens only.** Colors and typography are out of scope.
+
+## Contributing
+
+### Building
+
+```bash
+./gradlew buildPlugin                 # zip in build/distributions/
+./gradlew test                        # unit + integration tests (Kotlin plugin in K2 mode)
+./gradlew test -PkotlinK2Mode=false   # same suite against K1
+./gradlew runIde                      # sandbox IDE with the plugin installed
+./gradlew verifyPlugin                # compatibility check across supported IDE versions
+```
+
+Requires JDK 21.
+
+### Updating token values
+
+Values are **generated, not hand-written**. `scripts/update-tokens.py` reads the design system's
+default theme from GitHub and follows each token down to its literal:
 
 ```
 DefaultIconTokens.sizeSm  ->  IntermediateDefault.IconSizeSm  ->  Scale20  ->  20.dp
 ```
 
-and writes `src/main/kotlin/com/infomaniak/dstokeninfo/EsdsTokenValues.kt`.
-
-Every app theme (Mail, kDrive, kChat, Calendar, Contacts, Euria, kNote, Security, SwissTransfer,
-Infomaniak) currently maps these dimension tokens to the exact same primitives, so the default theme
-is a faithful source for all of them. Locally overridden values (`CompositionLocalProvider`) are not
-taken into account — by design, since in practice they never change.
-
-Refresh the values after a design system update:
+and regenerates `src/main/kotlin/com/infomaniak/esdscompanion/EsdsTokenValues.kt`:
 
 ```bash
-python3 scripts/update-tokens.py            # reads the `main` branch
+python3 scripts/update-tokens.py              # design system `main` branch
 python3 scripts/update-tokens.py --ref 1.2.0  # or a specific tag
 ```
 
-If the design system ever gains a new token, the script picks it up automatically; if a theme starts
-diverging from the default one, the values here would need a per-theme strategy instead.
+New tokens and categories are picked up automatically. Bump `pluginVersion` in `gradle.properties`
+before publishing a new build; otherwise the IDE treats the new build as already installed.
 
-## How it works
+### How it works
 
-### Inlay hints
+#### Inlay hints
 
 `EsdsTokenInlayHintsProvider` is a *declarative* inlay provider, which is what gives the per-user
 on/off switch in Settings for free — no custom settings UI is needed. It matches whole
@@ -107,7 +126,7 @@ on/off switch in Settings for free — no custom settings UI is needed. It match
 dot-qualified expression too, but it is not a complete token reference, so no hint is emitted twice
 for the same expression.
 
-### Completion by value
+#### Completion by value
 
 Kotlin lexes `spacing.16` as `spacing` followed by the number literal `.16`, so the Kotlin plugin
 has nothing to offer there. `EsdsValueCompletion` takes over that context entirely: it adds the
@@ -118,7 +137,7 @@ The popup opened by typing `EsdsTheme.spacing.` only holds names, which digits c
 it would simply close. The name branch therefore calls `restartCompletionOnPrefixChange` for
 all-digit prefixes, which reruns completion and lands in the value branch instead.
 
-### Jumping to the definition
+#### Jumping to the definition
 
 Clicking a hint opens the file that states what the token is worth. The design system reaches the
 literal through three files, so `EsdsTokenNavigator` looks for the closest one available in the
@@ -144,7 +163,7 @@ system is usually a library, so the file sits inside a jar and a rebuilt `file:/
 nothing. When sources are unavailable altogether — Gradle source downloads turned off — the click
 reports it in the editor rather than silently doing nothing.
 
-### Code completion
+#### Code completion
 
 `EsdsTokenCompletionContributor` is registered with `order="first"`, calls
 `runRemainingContributors` to intercept the items produced by the Kotlin plugin, and re-renders the
@@ -165,21 +184,15 @@ member is left alone. The trade-off: aliasing the receiver into a local variable
 > `any` ones **after** every language-specific contributor — so an `any` contributor runs last and
 > `runRemainingContributors` finds nothing left to decorate. This is covered by an integration test.
 
-## Development
+### Tests
 
-```bash
-./gradlew test                        # unit + integration tests (Kotlin plugin in K2 mode)
-./gradlew test -PkotlinK2Mode=false   # same suite against K1
-./gradlew runIde                      # launch a sandbox IDE with the plugin installed
-./gradlew verifyPlugin                # compatibility check against the supported IDE range
-```
+The integration tests run the real Kotlin completion and inlay hint passes against the bundled
+Kotlin plugin, so they catch contributor-ordering regressions. They check, for example, that
+`EsdsTheme.icon.si<caret>` renders `sizeSm` with `20dp`, and that typing `16` into an open popup
+narrows it to `xl`. `PluginRegistrationTest` validates the `plugin.xml` wiring.
+`EsdsTokenNavigatorTest` runs the definition lookup against verbatim copies of the design system
+files.
 
-The integration tests drive the *real* Kotlin completion and inlay hint passes against the bundled
-Kotlin plugin: they assert that `EsdsTheme.icon.si<caret>` renders `sizeSm` with `20dp`, and that
-`EsdsTheme.spacing.md` gets an `8dp` inlay. That is what catches contributor-ordering regressions.
-`PluginRegistrationTest` additionally checks the `plugin.xml` wiring, including that the settings
-labels resolve to real resource bundle entries and that the click handler is registered under the id
-the hints reference. `EsdsTokenNavigatorTest` runs the definition lookup against verbatim copies of
-the real design system files.
+## License
 
-Bump `pluginVersion` in `gradle.properties` before sharing a new build.
+[GPL-3.0](LICENSE), like the Infomaniak design system.

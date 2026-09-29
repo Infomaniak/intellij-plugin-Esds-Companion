@@ -1,4 +1,4 @@
-package com.infomaniak.dstokeninfo
+package com.infomaniak.esdscompanion
 
 import com.intellij.codeInsight.hints.declarative.InlayActionHandler
 import com.intellij.codeInsight.hints.declarative.InlayActionPayload
@@ -49,7 +49,7 @@ internal class EsdsTokenNavigationHandler : InlayActionHandler {
         if (target == null) {
             // Doing nothing at all would just look like a broken hint, so explain why instead.
             HintManager.getInstance()
-                .showErrorHint(editor, DsTokenInfoBundle.message("navigation.sourceNotFound", token))
+                .showErrorHint(editor, EsdsCompanionBundle.message("navigation.sourceNotFound", token))
             return
         }
 
@@ -62,7 +62,7 @@ internal class EsdsTokenNavigationHandler : InlayActionHandler {
     }
 
     companion object {
-        const val HANDLER_ID: String = "com.infomaniak.dstokeninfo.navigateToToken"
+        const val HANDLER_ID: String = "com.infomaniak.esdscompanion.navigateToToken"
 
         private const val SEPARATOR = "/"
 

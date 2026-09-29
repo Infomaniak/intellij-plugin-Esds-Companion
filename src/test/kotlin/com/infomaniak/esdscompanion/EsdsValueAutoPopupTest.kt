@@ -1,4 +1,4 @@
-package com.infomaniak.dstokeninfo
+package com.infomaniak.esdscompanion
 
 import com.intellij.testFramework.EdtTestUtil
 import com.intellij.testFramework.LightProjectDescriptor

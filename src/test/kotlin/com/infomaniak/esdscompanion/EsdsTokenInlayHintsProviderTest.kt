@@ -1,4 +1,4 @@
-package com.infomaniak.dstokeninfo
+package com.infomaniak.esdscompanion
 
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.utils.inlays.declarative.DeclarativeInlayHintsProviderTestCase
@@ -23,9 +23,9 @@ class EsdsTokenInlayHintsProviderTest : DeclarativeInlayHintsProviderTestCase() 
         doTest(
             """
             fun screen() {
-                val iconSize = EsdsTheme.icon.sizeSm/*<# [icon/sizeSm:com.infomaniak.dstokeninfo.navigateToToken]20dp #>*/
-                val padding = EsdsTheme.spacing.md/*<# [spacing/md:com.infomaniak.dstokeninfo.navigateToToken]8dp #>*/
-                val shape = EsdsTheme.radius.full/*<# [radius/full:com.infomaniak.dstokeninfo.navigateToToken]full #>*/
+                val iconSize = EsdsTheme.icon.sizeSm/*<# [icon/sizeSm:com.infomaniak.esdscompanion.navigateToToken]20dp #>*/
+                val padding = EsdsTheme.spacing.md/*<# [spacing/md:com.infomaniak.esdscompanion.navigateToToken]8dp #>*/
+                val shape = EsdsTheme.radius.full/*<# [radius/full:com.infomaniak.esdscompanion.navigateToToken]full #>*/
             }
             """.trimIndent(),
         )
@@ -35,7 +35,7 @@ class EsdsTokenInlayHintsProviderTest : DeclarativeInlayHintsProviderTestCase() 
         doTest(
             """
             fun screen() {
-                Box(Modifier.padding(EsdsTheme.spacing.lg/*<# [spacing/lg:com.infomaniak.dstokeninfo.navigateToToken]12dp #>*/))
+                Box(Modifier.padding(EsdsTheme.spacing.lg/*<# [spacing/lg:com.infomaniak.esdscompanion.navigateToToken]12dp #>*/))
             }
             """.trimIndent(),
         )
@@ -45,7 +45,7 @@ class EsdsTokenInlayHintsProviderTest : DeclarativeInlayHintsProviderTestCase() 
         doTest(
             """
             fun screen() {
-                val iconSize = MailTheme.icon.sizeXl/*<# [icon/sizeXl:com.infomaniak.dstokeninfo.navigateToToken]40dp #>*/
+                val iconSize = MailTheme.icon.sizeXl/*<# [icon/sizeXl:com.infomaniak.esdscompanion.navigateToToken]40dp #>*/
             }
             """.trimIndent(),
         )

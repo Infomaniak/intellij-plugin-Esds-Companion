@@ -1,4 +1,4 @@
-package com.infomaniak.dstokeninfo
+package com.infomaniak.esdscompanion
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile

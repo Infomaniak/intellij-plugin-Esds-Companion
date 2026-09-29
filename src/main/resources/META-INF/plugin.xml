@@ -1,25 +1,25 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.infomaniak.DsTokenInfoPlugin</id>
-    <name>Infomaniak Design System Token Info</name>
-    <vendor url="https://github.com/Infomaniak/android-design-system">Infomaniak</vendor>
+    <id>com.infomaniak.esdscompanion</id>
+    <name>Esds Companion</name>
+    <vendor url="https://www.infomaniak.com">Infomaniak</vendor>
 
     <description><![CDATA[
-        Shows the real value of <b>Infomaniak design system</b> tokens directly in code completion.
-        <br/><br/>
-        Instead of the uninformative <code>Dp</code> type, completing
-        <code>EsdsTheme.icon.sizeSm</code> displays <code>20dp</code> on the right of the
-        completion item. Works for <code>EsdsTheme.icon</code>, <code>EsdsTheme.spacing</code>
-        and <code>EsdsTheme.radius</code>.
-        <br/><br/>
-        Tokens can also be found <b>by value</b>: typing <code>EsdsTheme.spacing.16</code> offers
-        <code>xl</code>, and picking it replaces the number with the token name.
-        <br/><br/>
-        Optionally, <b>inlay hints</b> can show the same values inline next to each call site.
-        Turn them on under <i>Settings | Editor | Inlay Hints | Values</i>.
-        <br/><br/>
-        Values are generated from the design system's default theme; all app themes map these
-        dimension tokens to the same primitives, so the displayed values are accurate everywhere.
+        Companion for the <a href="https://github.com/Infomaniak/android-design-system">Infomaniak
+        Android design system</a> (ESDS): see the real value behind dimension tokens while you write
+        Kotlin.
+        <ul>
+            <li><b>Completion shows values</b>: <code>EsdsTheme.icon.sizeSm</code> displays
+                <code>20dp</code> instead of the uninformative <code>Dp</code> type.</li>
+            <li><b>Find a token by value</b>: type <code>EsdsTheme.spacing.16</code> and pick
+                <code>xl</code>; the number is replaced with the token name.</li>
+            <li><b>Inlay hints</b> (opt-in) show the value next to each call site. Turn them on
+                under <i>Settings | Editor | Inlay Hints | Values</i>.</li>
+            <li><b>Ctrl/Cmd-click a hint</b> to open the design system file defining the token.</li>
+        </ul>
+        Covers <code>icon</code>, <code>spacing</code> and <code>radius</code> tokens, on
+        <code>EsdsTheme</code> as well as per-app themes such as <code>MailTheme</code>.
+        Values come from the design system's default theme.
     ]]></description>
 
     <!-- Core platform only: the plugin works in Android Studio and every IntelliJ-based IDE. -->
@@ -38,7 +38,7 @@
         <completion.contributor
                 language="kotlin"
                 order="first"
-                implementationClass="com.infomaniak.dstokeninfo.EsdsTokenCompletionContributor"/>
+                implementationClass="com.infomaniak.esdscompanion.EsdsTokenCompletionContributor"/>
 
         <!--
           Declarative inlay hints get a per-user on/off switch for free, under
@@ -47,17 +47,17 @@
         -->
         <codeInsight.declarativeInlayProvider
                 language="kotlin"
-                providerId="com.infomaniak.dstokeninfo.tokenValues"
+                providerId="com.infomaniak.esdscompanion.tokenValues"
                 group="VALUES_GROUP"
                 isEnabledByDefault="false"
-                bundle="messages.DsTokenInfoBundle"
+                bundle="messages.EsdsCompanionBundle"
                 nameKey="inlay.esdsTokenValues.name"
                 descriptionKey="inlay.esdsTokenValues.description"
-                implementationClass="com.infomaniak.dstokeninfo.EsdsTokenInlayHintsProvider"/>
+                implementationClass="com.infomaniak.esdscompanion.EsdsTokenInlayHintsProvider"/>
 
         <!-- Makes the inlay hints clickable: jumps to the design system source. -->
         <codeInsight.inlayActionHandler
-                handlerId="com.infomaniak.dstokeninfo.navigateToToken"
-                implementationClass="com.infomaniak.dstokeninfo.EsdsTokenNavigationHandler"/>
+                handlerId="com.infomaniak.esdscompanion.navigateToToken"
+                implementationClass="com.infomaniak.esdscompanion.EsdsTokenNavigationHandler"/>
     </extensions>
 </idea-plugin>

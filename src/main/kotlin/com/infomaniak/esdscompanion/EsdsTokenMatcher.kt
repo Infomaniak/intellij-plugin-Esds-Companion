@@ -1,4 +1,4 @@
-package com.infomaniak.dstokeninfo
+package com.infomaniak.esdscompanion
 
 /**
  * Recognises references to design system tokens, such as `EsdsTheme.icon.sizeSm`.
