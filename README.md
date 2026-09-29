@@ -34,15 +34,15 @@ EsdsTheme.spacing.1|              EsdsTheme.spacing.16|
 Tokens whose value **starts with** the digits are listed, smallest first. Picking one replaces the
 digits with the token name, so `EsdsTheme.spacing.16` becomes `EsdsTheme.spacing.xl`.
 
-### Inlay hints (opt-in)
+### Inlay hints
 
-The value can also appear inline, next to each call site:
+The value also appears inline, next to each call site:
 
 ```kotlin
 Box(Modifier.padding(EsdsTheme.spacing.md 8dp))
 ```
 
-Inlay hints are **off by default**. To turn them on, go to
+Inlay hints are **on by default**. To turn them off, go to
 **Settings → Editor → Inlay Hints → Values → _Infomaniak design system token values_**.
 
 **Ctrl-click** (**Cmd-click** on macOS) a hint to open the design system source that defines the

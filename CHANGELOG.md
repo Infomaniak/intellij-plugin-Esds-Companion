@@ -4,7 +4,8 @@
 
 - Renamed to **Esds Companion**. The plugin ID changed to `com.infomaniak.esdscompanion`, so
   uninstall the previous "Infomaniak Design System Token Info" plugin before installing this one.
-  The inlay hints setting also resets to off, because it is keyed by the renamed provider.
+- Inlay hints are now on by default. They can still be turned off under
+  *Settings | Editor | Inlay Hints | Values*.
 - Released publicly under GPL-3.0.
 
 ## 1.1.0

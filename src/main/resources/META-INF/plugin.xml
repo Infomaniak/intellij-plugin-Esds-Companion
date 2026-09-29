@@ -13,8 +13,8 @@
                 <code>20dp</code> instead of the uninformative <code>Dp</code> type.</li>
             <li><b>Find a token by value</b>: type <code>EsdsTheme.spacing.16</code> and pick
                 <code>xl</code>; the number is replaced with the token name.</li>
-            <li><b>Inlay hints</b> (opt-in) show the value next to each call site. Turn them on
-                under <i>Settings | Editor | Inlay Hints | Values</i>.</li>
+            <li><b>Inlay hints</b> show the value next to each call site. Turn them off under
+                <i>Settings | Editor | Inlay Hints | Values</i>.</li>
             <li><b>Ctrl/Cmd-click a hint</b> to open the design system file defining the token.</li>
         </ul>
         Covers <code>icon</code>, <code>spacing</code> and <code>radius</code> tokens, on
@@ -42,14 +42,13 @@
 
         <!--
           Declarative inlay hints get a per-user on/off switch for free, under
-          Settings | Editor | Inlay Hints. Disabled by default so the plugin stays unobtrusive
-          until someone opts in.
+          Settings | Editor | Inlay Hints. Enabled by default; each user can turn them off there.
         -->
         <codeInsight.declarativeInlayProvider
                 language="kotlin"
                 providerId="com.infomaniak.esdscompanion.tokenValues"
                 group="VALUES_GROUP"
-                isEnabledByDefault="false"
+                isEnabledByDefault="true"
                 bundle="messages.EsdsCompanionBundle"
                 nameKey="inlay.esdsTokenValues.name"
                 descriptionKey="inlay.esdsTokenValues.description"

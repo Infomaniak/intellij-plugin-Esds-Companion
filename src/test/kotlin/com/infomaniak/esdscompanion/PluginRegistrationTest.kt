@@ -30,11 +30,11 @@ class PluginRegistrationTest {
     }
 
     @Test
-    fun `inlay hints provider is registered and opt-in`() {
+    fun `inlay hints provider is registered and on by default`() {
         val registration = extension("codeInsight.declarativeInlayProvider")
 
         assertEquals("kotlin", registration.attribute("language"))
-        assertEquals("false", registration.attribute("isEnabledByDefault"))
+        assertEquals("true", registration.attribute("isEnabledByDefault"))
         assertClassExists(registration.attribute("implementationClass"))
     }
 
