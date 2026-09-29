@@ -22,6 +22,12 @@ internal object EsdsTokenMatcher {
     /** `SomeTheme . category . partiallyTypedToken`, ending exactly at the caret. */
     private val PREFIX_REGEX = Regex("""(\w+)\s*\.\s*(\w+)\s*\.\s*\w*$""")
 
+    /**
+     * `SomeTheme . category . 16`, ending exactly at the caret. The digits sit right after the dot:
+     * Kotlin lexes `.16` as a number literal, so there is no whitespace to allow for.
+     */
+    private val VALUE_QUERY_REGEX = Regex("""(\w+)\s*\.\s*([A-Za-z_]\w*)\s*\.(\d+)$""")
+
     /** A complete `SomeTheme.category.token` reference. */
     private val EXPRESSION_REGEX = Regex("""(\w+)\s*\.\s*(\w+)\s*\.\s*(\w+)""")
 
@@ -42,6 +48,25 @@ internal object EsdsTokenMatcher {
         if (!theme.endsWith(THEME_SUFFIX)) return null
 
         return category.takeIf { it in EsdsTokenValues.knownCategories }
+    }
+
+    /** The start of a token's value typed instead of its name, as in `EsdsTheme.spacing.16`. */
+    data class ValueQuery(val category: String, val digits: String)
+
+    /**
+     * Detects a token being looked up by value rather than by name, e.g. `EsdsTheme.spacing.16`
+     * standing for `EsdsTheme.spacing.xl`. Returns `null` in any other context.
+     */
+    fun detectValueQueryBeforeCaret(fileText: CharSequence, caretOffset: Int): ValueQuery? {
+        if (caretOffset <= 0 || caretOffset > fileText.length) return null
+
+        val from = (caretOffset - LOOKBEHIND).coerceAtLeast(0)
+        val match = VALUE_QUERY_REGEX.find(fileText.subSequence(from, caretOffset)) ?: return null
+
+        val (theme, category, digits) = match.destructured
+        if (!theme.endsWith(THEME_SUFFIX) || category !in EsdsTokenValues.knownCategories) return null
+
+        return ValueQuery(category, digits)
     }
 
     /** A resolved token reference: which category and token it is, and its value. */

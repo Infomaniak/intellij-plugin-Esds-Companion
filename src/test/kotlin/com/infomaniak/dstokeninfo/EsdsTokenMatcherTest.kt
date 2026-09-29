@@ -98,4 +98,29 @@ class EsdsTokenMatcherTest {
         assertNull(EsdsTokenMatcher.resolveExpression("binding.icon.sizeSm"))
         assertNull(EsdsTokenMatcher.resolveExpression("foo(EsdsTheme.icon.sizeSm)"))
     }
+
+    private fun valueQuery(code: String): EsdsTokenMatcher.ValueQuery? {
+        val offset = code.indexOf('|')
+        require(offset >= 0) { "Missing caret marker" }
+        return EsdsTokenMatcher.detectValueQueryBeforeCaret(code.replace("|", ""), offset)
+    }
+
+    @Test
+    fun `detects a token being looked up by value`() {
+        assertEquals(EsdsTokenMatcher.ValueQuery("spacing", "16"), valueQuery("Modifier.padding(EsdsTheme.spacing.16|)"))
+        assertEquals(EsdsTokenMatcher.ValueQuery("icon", "2"), valueQuery("MailTheme.icon.2|"))
+    }
+
+    @Test
+    fun `value lookup needs a theme receiver and a known category`() {
+        assertNull(valueQuery("binding.spacing.16|"))
+        assertNull(valueQuery("EsdsTheme.colors.16|"))
+    }
+
+    @Test
+    fun `value lookup leaves real numbers and names alone`() {
+        assertNull(valueQuery("val ratio = 1.5|"))
+        assertNull(valueQuery("EsdsTheme.spacing.md|"))
+        assertNull(valueQuery("EsdsTheme.spacing.|"))
+    }
 }

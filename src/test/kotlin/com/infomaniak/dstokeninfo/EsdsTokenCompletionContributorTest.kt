@@ -1,7 +1,9 @@
 package com.infomaniak.dstokeninfo
 
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.codeInsight.lookup.LookupElementPresentation
+import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 
@@ -52,6 +54,44 @@ class EsdsTokenCompletionContributorTest : BasePlatformTestCase() {
         assertEquals("Dp", rendered["md"])
     }
 
+    private fun lookupStringsFor(code: String): List<String> {
+        myFixture.configureByText("Screen.kt", DESIGN_SYSTEM_STUB + code)
+        myFixture.completeBasic()
+        return myFixture.lookupElementStrings.orEmpty()
+    }
+
+    fun `test digits list the tokens whose value starts with them, smallest first`() {
+        assertEquals(listOf("lg", "xl", "eightXl"), lookupStringsFor("fun screen() { EsdsTheme.spacing.1<caret> }"))
+        assertEquals(listOf("sizeSm", "sizeMd"), lookupStringsFor("fun screen() { EsdsTheme.icon.2<caret> }"))
+    }
+
+    fun `test a value matching a single token is replaced by its name`() {
+        myFixture.configureByText("Screen.kt", DESIGN_SYSTEM_STUB + "fun screen() { EsdsTheme.spacing.16<caret> }")
+        myFixture.completeBasic()
+
+        assertTrue(myFixture.editor.document.text.endsWith("fun screen() { EsdsTheme.spacing.xl }"))
+    }
+
+    /** The popup opened on the dot only holds names: typing digits must switch it to values. */
+    fun `test typing digits into an open popup narrows it down by value`() {
+        myFixture.configureByText("Screen.kt", DESIGN_SYSTEM_STUB + "fun screen() { EsdsTheme.spacing.<caret> }")
+        myFixture.completeBasic()
+
+        myFixture.type('1')
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        assertEquals(listOf("lg", "xl", "eightXl"), myFixture.lookupElementStrings)
+
+        myFixture.type('6')
+        assertEquals(listOf("xl"), myFixture.lookupElementStrings)
+
+        myFixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
+        assertTrue(myFixture.editor.document.text.endsWith("fun screen() { EsdsTheme.spacing.xl }"))
+    }
+
+    fun `test value lookup ignores unrelated receivers`() {
+        assertEquals(emptyList<String>(), lookupStringsFor("fun screen() { unrelatedHolder.spacing.1<caret> }"))
+    }
+
     private companion object {
         /**
          * Minimal stand-in for the design system: the real classes are not on the test
@@ -62,7 +102,7 @@ class EsdsTokenCompletionContributorTest : BasePlatformTestCase() {
 
             class Dp
             class IconTokens(val sizeXs: Dp, val sizeSm: Dp, val sizeMd: Dp, val sizeLg: Dp, val sizeXl: Dp)
-            class SpacingTokens(val md: Dp, val eightXl: Dp)
+            class SpacingTokens(val md: Dp, val lg: Dp, val xl: Dp, val eightXl: Dp)
 
             object EsdsTheme {
                 val icon: IconTokens get() = throw UnsupportedOperationException()

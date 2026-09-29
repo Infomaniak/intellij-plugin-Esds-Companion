@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- Find a token by its value: typing `EsdsTheme.spacing.1` lists the spacings whose value starts with
+  1 (`lg 12dp`, `xl 16dp`, `eightXl 100dp`), and `EsdsTheme.spacing.16` narrows it down to `xl`.
+  Picking an item replaces the number with the token name. Works for every token category.
+
 ## 1.0.1
 
 - Fix clicking an inlay hint doing nothing when the design system comes from a library: the target

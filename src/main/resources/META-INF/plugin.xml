@@ -12,6 +12,9 @@
         completion item. Works for <code>EsdsTheme.icon</code>, <code>EsdsTheme.spacing</code>
         and <code>EsdsTheme.radius</code>.
         <br/><br/>
+        Tokens can also be found <b>by value</b>: typing <code>EsdsTheme.spacing.16</code> offers
+        <code>xl</code>, and picking it replaces the number with the token name.
+        <br/><br/>
         Optionally, <b>inlay hints</b> can show the same values inline next to each call site.
         Turn them on under <i>Settings | Editor | Inlay Hints | Values</i>.
         <br/><br/>

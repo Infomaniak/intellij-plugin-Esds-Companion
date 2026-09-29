@@ -15,6 +15,21 @@ EsdsTheme.icon.|
                 sizeXl      40dp
 ```
 
+## Finding a token by its value
+
+When you know the dimension but not the token name, type the number instead:
+
+```
+EsdsTheme.spacing.1|              EsdsTheme.spacing.16|
+                  lg       12dp                     xl    16dp
+                  xl       16dp
+                  eightXl  100dp
+```
+
+Items are kept when their value **starts with** the digits, smallest first, and accepting one
+replaces the digits with the token name (`EsdsTheme.spacing.xl`). This works for every category —
+`icon`, `spacing`, `radius` and any added later.
+
 ## Inlay hints (optional)
 
 The same values can be shown inline, right at each call site:
@@ -91,6 +106,17 @@ on/off switch in Settings for free — no custom settings UI is needed. It match
 `SomeTheme.category.token` expressions; a nested receiver such as `EsdsTheme.icon` is a
 dot-qualified expression too, but it is not a complete token reference, so no hint is emitted twice
 for the same expression.
+
+### Completion by value
+
+Kotlin lexes `spacing.16` as `spacing` followed by the number literal `.16`, so the Kotlin plugin
+has nothing to offer there. `EsdsValueCompletion` takes over that context entirely: it adds the
+category's tokens with a prefix matcher that compares the typed digits against each token's *value*
+rather than its name, then stops the remaining contributors.
+
+The popup opened by typing `EsdsTheme.spacing.` only holds names, which digits can never match, so
+it would simply close. The name branch therefore calls `restartCompletionOnPrefixChange` for
+all-digit prefixes, which reruns completion and lands in the value branch instead.
 
 ### Jumping to the definition
 
