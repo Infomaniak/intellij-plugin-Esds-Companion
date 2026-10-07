@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.0
+
+- Support `EsdsTheme.opacity` tokens. Values are shown as percentages: `EsdsTheme.opacity.ghost`
+  displays `5%` (the `0.05f` alpha). Value completion works too: `EsdsTheme.opacity.5` lists
+  `ghost 5%` and `medium 50%`.
+
 ## 2.0.0
 
 - Renamed to **Esds Companion**. The plugin ID changed to `com.infomaniak.esdscompanion`, so

@@ -48,6 +48,13 @@ class EsdsTokenCompletionContributorTest : BasePlatformTestCase() {
         assertEquals("100dp", rendered["eightXl"])
     }
 
+    fun `test opacity tokens show a percentage instead of the Float type`() {
+        val rendered = completeAndRender("fun screen() { EsdsTheme.opacity.<caret> }")
+
+        assertEquals("5%", rendered["ghost"])
+        assertEquals("100%", rendered["full"])
+    }
+
     fun `test unrelated members keep their original type text`() {
         val rendered = completeAndRender("fun screen() { unrelatedHolder.spacing.<caret> }")
 
@@ -63,6 +70,7 @@ class EsdsTokenCompletionContributorTest : BasePlatformTestCase() {
     fun `test digits list the tokens whose value starts with them, smallest first`() {
         assertEquals(listOf("lg", "xl", "eightXl"), lookupStringsFor("fun screen() { EsdsTheme.spacing.1<caret> }"))
         assertEquals(listOf("sizeSm", "sizeMd"), lookupStringsFor("fun screen() { EsdsTheme.icon.2<caret> }"))
+        assertEquals(listOf("ghost", "medium"), lookupStringsFor("fun screen() { EsdsTheme.opacity.5<caret> }"))
     }
 
     fun `test a value matching a single token is replaced by its name`() {
@@ -103,10 +111,12 @@ class EsdsTokenCompletionContributorTest : BasePlatformTestCase() {
             class Dp
             class IconTokens(val sizeXs: Dp, val sizeSm: Dp, val sizeMd: Dp, val sizeLg: Dp, val sizeXl: Dp)
             class SpacingTokens(val md: Dp, val lg: Dp, val xl: Dp, val eightXl: Dp)
+            class OpacityTokens(val none: Float, val ghost: Float, val medium: Float, val full: Float)
 
             object EsdsTheme {
                 val icon: IconTokens get() = throw UnsupportedOperationException()
                 val spacing: SpacingTokens get() = throw UnsupportedOperationException()
+                val opacity: OpacityTokens get() = throw UnsupportedOperationException()
             }
 
             object UnrelatedHolder {

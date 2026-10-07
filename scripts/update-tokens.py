@@ -8,7 +8,7 @@ follows the token indirection all the way down to the primitive literals.
 
     DefaultIconTokens.sizeSm -> IntermediateDefault.IconSizeSm -> Scale20 -> 20.dp
 
-Every app theme (Mail, kDrive, kChat, ...) currently maps these dimension tokens to the
+Every app theme (Mail, kDrive, kChat, ...) currently maps these dimension and opacity tokens to the
 exact same primitives, so the default theme is a faithful source for all of them.
 
 Usage:
@@ -35,12 +35,14 @@ CATEGORIES = {
     "icon": f"{FOUNDATION}/defaultvalues/DefaultIconTokens.kt",
     "spacing": f"{FOUNDATION}/defaultvalues/DefaultSpacingTokens.kt",
     "radius": f"{FOUNDATION}/defaultvalues/DefaultRadiusTokens.kt",
+    "opacity": f"{FOUNDATION}/defaultvalues/DefaultOpacityTokens.kt",
 }
 
 PRIMITIVE_FILES = [
     f"{PRIMITIVES}/ScalePrimitiveTokens.kt",
     f"{PRIMITIVES}/SpacingPrimitiveTokens.kt",
     f"{PRIMITIVES}/RadiusPrimitiveTokens.kt",
+    f"{PRIMITIVES}/OpacityPrimitiveTokens.kt",
 ]
 
 INTERMEDIATE = f"{FOUNDATION}/defaultvalues/internal/IntermediateDefault.kt"
@@ -85,6 +87,11 @@ def render_primitive(expression: str) -> str:
     rounded = re.fullmatch(r"RoundedCornerShape\(([\d.]+)\.dp\)", expression)
     if rounded:
         return f"{format_number(rounded.group(1))}dp"
+
+    # Opacities are Float fractions (`0.05f`); a percentage reads better next to a token name.
+    fraction = re.fullmatch(r"([\d.]+)f", expression)
+    if fraction:
+        return f"{format_number(str(round(float(fraction.group(1)) * 100, 4)))}%"
 
     if expression == "RectangleShape":
         return "0dp"
@@ -137,13 +144,13 @@ def main() -> int:
         "package com.infomaniak.esdscompanion",
         "",
         "/**",
-        " * Resolved dimension values of the Infomaniak design system tokens, keyed by the",
-        " * `EsdsTheme` accessor they are reached through (`icon`, `spacing`, `radius`).",
+        " * Resolved values of the Infomaniak design system tokens, keyed by the `EsdsTheme`",
+        " * accessor they are reached through (`icon`, `spacing`, `radius`, `opacity`).",
         " */",
         "internal object EsdsTokenValues {",
         "",
         "    /**",
-        "     * @param value the resolved dimension, e.g. `20dp`.",
+        "     * @param value the resolved value, e.g. `20dp` or `5%`.",
         f"     * @param declarationName the property declaring this token in `{DECLARATION_OBJECT}`,",
         "     *   e.g. `IconSizeSm`.",
         "     * @param primitiveName the primitive holding the literal, e.g. `Scale20`.",

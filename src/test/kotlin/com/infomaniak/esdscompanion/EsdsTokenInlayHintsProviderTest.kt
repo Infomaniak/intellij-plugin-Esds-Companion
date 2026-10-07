@@ -26,6 +26,7 @@ class EsdsTokenInlayHintsProviderTest : DeclarativeInlayHintsProviderTestCase() 
                 val iconSize = EsdsTheme.icon.sizeSm/*<# [icon/sizeSm:com.infomaniak.esdscompanion.navigateToToken]20dp #>*/
                 val padding = EsdsTheme.spacing.md/*<# [spacing/md:com.infomaniak.esdscompanion.navigateToToken]8dp #>*/
                 val shape = EsdsTheme.radius.full/*<# [radius/full:com.infomaniak.esdscompanion.navigateToToken]full #>*/
+                val alpha = EsdsTheme.opacity.ghost/*<# [opacity/ghost:com.infomaniak.esdscompanion.navigateToToken]5% #>*/
             }
             """.trimIndent(),
         )

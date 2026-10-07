@@ -6,7 +6,7 @@
 
     <description><![CDATA[
         Companion for the <a href="https://github.com/Infomaniak/android-design-system">Infomaniak
-        Android design system</a> (ESDS): see the real value behind dimension tokens while you write
+        Android design system</a> (ESDS): see the real value behind dimension and opacity tokens while you write
         Kotlin.
         <ul>
             <li><b>Completion shows values</b>: <code>EsdsTheme.icon.sizeSm</code> displays
@@ -17,7 +17,7 @@
                 <i>Settings | Editor | Inlay Hints | Values</i>.</li>
             <li><b>Ctrl/Cmd-click a hint</b> to open the design system file defining the token.</li>
         </ul>
-        Covers <code>icon</code>, <code>spacing</code> and <code>radius</code> tokens, on
+        Covers <code>icon</code>, <code>spacing</code>, <code>radius</code> and <code>opacity</code> tokens, on
         <code>EsdsTheme</code> as well as per-app themes such as <code>MailTheme</code>.
         Values come from the design system's default theme.
     ]]></description>

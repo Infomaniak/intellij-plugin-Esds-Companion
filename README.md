@@ -2,14 +2,14 @@
 
 An Android Studio / IntelliJ plugin for the
 [Infomaniak Android design system](https://github.com/Infomaniak/android-design-system) (ESDS). It
-shows the real value behind dimension tokens while you write Kotlin, which the IDE can't do by
+shows the real value behind dimension and opacity tokens while you write Kotlin, which the IDE can't do by
 itself.
 
 ## Features
 
 ### Values in code completion
 
-The completion popup shows each token's actual dimension instead of the `Dp` type:
+The completion popup shows each token's actual value instead of the `Dp` or `Float` type:
 
 ```
 EsdsTheme.icon.|
@@ -22,7 +22,7 @@ EsdsTheme.icon.|
 
 ### Find a token by its value
 
-If you know the dimension but not the token name, type the number instead:
+If you know the value but not the token name, type the number instead:
 
 ```
 EsdsTheme.spacing.1|              EsdsTheme.spacing.16|
@@ -52,11 +52,12 @@ sources* and re-sync.
 
 ### Supported tokens
 
-| Accessor            | Example                 | Shown                               |
-|---------------------|-------------------------|-------------------------------------|
-| `EsdsTheme.icon`    | `EsdsTheme.icon.sizeSm` | `20dp`                              |
-| `EsdsTheme.spacing` | `EsdsTheme.spacing.md`  | `8dp`                               |
-| `EsdsTheme.radius`  | `EsdsTheme.radius.lg`   | `8dp` (`full` for the circle shape) |
+| Accessor            | Example                   | Shown                               |
+|---------------------|---------------------------|-------------------------------------|
+| `EsdsTheme.icon`    | `EsdsTheme.icon.sizeSm`   | `20dp`                              |
+| `EsdsTheme.spacing` | `EsdsTheme.spacing.md`    | `8dp`                               |
+| `EsdsTheme.radius`  | `EsdsTheme.radius.lg`     | `8dp` (`full` for the circle shape) |
+| `EsdsTheme.opacity` | `EsdsTheme.opacity.ghost` | `5%` (the `0.05f` alpha)            |
 
 Per-app themes work too, as long as their name ends in `Theme` (`MailTheme.spacing.md`).
 
@@ -81,7 +82,7 @@ newer. There is no upper version bound.
   overridden locally with `CompositionLocalProvider` aren't reflected.
 - **Receivers are matched by text.** `EsdsTheme.spacing.md` is recognised, but a receiver stored in
   a variable (`val s = EsdsTheme.spacing; s.md`) is not.
-- **Dimension tokens only.** Colors and typography are out of scope.
+- **Dimension and opacity tokens only.** Colors and typography are out of scope.
 
 ## Contributing
 
@@ -113,7 +114,10 @@ python3 scripts/update-tokens.py              # design system `main` branch
 python3 scripts/update-tokens.py --ref 1.2.0  # or a specific tag
 ```
 
-New tokens and categories are picked up automatically. Bump `pluginVersion` in `gradle.properties`
+New tokens in an existing category are picked up automatically. A new category (a new
+`EsdsTheme.xxx` accessor) must be added to `CATEGORIES` and its primitives file to `PRIMITIVE_FILES`
+in the script; if its literals are neither `Dp`, shapes nor `Float`s, teach `render_primitive` to
+display them. Bump `pluginVersion` in `gradle.properties`
 before publishing a new build; otherwise the IDE treats the new build as already installed.
 
 ### How it works

@@ -4,13 +4,13 @@
 package com.infomaniak.esdscompanion
 
 /**
- * Resolved dimension values of the Infomaniak design system tokens, keyed by the
- * `EsdsTheme` accessor they are reached through (`icon`, `spacing`, `radius`).
+ * Resolved values of the Infomaniak design system tokens, keyed by the `EsdsTheme`
+ * accessor they are reached through (`icon`, `spacing`, `radius`, `opacity`).
  */
 internal object EsdsTokenValues {
 
     /**
-     * @param value the resolved dimension, e.g. `20dp`.
+     * @param value the resolved value, e.g. `20dp` or `5%`.
      * @param declarationName the property declaring this token in `IntermediateDefault`,
      *   e.g. `IconSizeSm`.
      * @param primitiveName the primitive holding the literal, e.g. `Scale20`.
@@ -30,6 +30,7 @@ internal object EsdsTokenValues {
         "icon" to "DefaultIconTokens.kt",
         "spacing" to "DefaultSpacingTokens.kt",
         "radius" to "DefaultRadiusTokens.kt",
+        "opacity" to "DefaultOpacityTokens.kt",
     )
 
     val categories: Map<String, Map<String, Token>> = mapOf(
@@ -67,6 +68,16 @@ internal object EsdsTokenValues {
             "threeXl" to Token("24dp", "Radius3xl", "Radius24", "RadiusPrimitiveTokens.kt"),
             "fourXl" to Token("32dp", "Radius4xl", "Radius32", "RadiusPrimitiveTokens.kt"),
             "full" to Token("full", "RadiusFull", "Radius1000", "RadiusPrimitiveTokens.kt"),
+        ),
+        "opacity" to mapOf(
+            "none" to Token("0%", "OpacityNone", "Opacity0", "OpacityPrimitiveTokens.kt"),
+            "ghost" to Token("5%", "OpacityGhost", "Opacity5", "OpacityPrimitiveTokens.kt"),
+            "subtle" to Token("10%", "OpacitySubtle", "Opacity10", "OpacityPrimitiveTokens.kt"),
+            "soft" to Token("25%", "OpacitySoft", "Opacity25", "OpacityPrimitiveTokens.kt"),
+            "medium" to Token("50%", "OpacityMedium", "Opacity50", "OpacityPrimitiveTokens.kt"),
+            "strong" to Token("75%", "OpacityStrong", "Opacity75", "OpacityPrimitiveTokens.kt"),
+            "heavy" to Token("90%", "OpacityHeavy", "Opacity90", "OpacityPrimitiveTokens.kt"),
+            "full" to Token("100%", "OpacityFull", "Opacity100", "OpacityPrimitiveTokens.kt"),
         ),
     )
 
