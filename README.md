@@ -3,7 +3,7 @@
 An Android Studio / IntelliJ plugin for the
 [Infomaniak Android design system](https://github.com/Infomaniak/android-design-system) (ESDS). It
 shows the real value behind dimension and opacity tokens while you write Kotlin, which the IDE can't do by
-itself.
+itself, and previews design system icons.
 
 ## Features
 
@@ -50,6 +50,24 @@ token, for example the `sizeSm = …` line in `DefaultIconTokens.kt`. This needs
 sources in your project. If navigation reports missing sources, enable *Settings → Build Tools → Gradle → Download
 sources* and re-sync.
 
+### Icon previews
+
+`EsdsIcons.Medium.Plus` is previewed in the completion popup and in the gutter of every line using
+it. Completing `EsdsIcons.` shows the size each category is designed for:
+
+```
+EsdsIcons.|
+          ExtraSmall  16dp
+          Small       20dp
+          Medium      24dp
+          Large       32dp
+          ExtraLarge  40dp
+```
+
+Previews use the editor text color, whatever the icon's own color is. To pick another one, go to
+**Settings → Tools → Esds Companion**. Gutter previews can be turned off under **Settings → Editor →
+General → Gutter Icons**.
+
 ### Supported tokens
 
 | Accessor            | Example                   | Shown                               |
@@ -83,6 +101,9 @@ newer. There is no upper version bound.
 - **Receivers are matched by text.** `EsdsTheme.spacing.md` is recognised, but a receiver stored in
   a variable (`val s = EsdsTheme.spacing; s.md`) is not.
 - **Dimension and opacity tokens only.** Colors and typography are out of scope.
+- **Icon previews need the compiled design system** on the project classpath, as with any Android
+  module depending on it after a Gradle sync. A pure Kotlin Multiplatform common module has no
+  compiled classes to read, so it gets no previews.
 
 ## Contributing
 
@@ -188,6 +209,14 @@ detected.
 > `any` ones **after** every language-specific contributor — so an `any` contributor runs last and
 > `runRemainingContributors` finds nothing left to decorate. This is covered by an integration test.
 
+#### Icon previews
+
+Nothing is bundled or scraped: each icon is read from the design system the project depends on. Its
+getter, such as `EsdsIcons.Medium.Plus`, compiles to a flat sequence of fully inlined
+`ImageVector.Builder` and `PathBuilder` calls with constant arguments. `EsdsIconVector` reads that
+bytecode with the ASM copy bundled in the platform, replays the path commands onto a Java2D `Path2D`
+and paints it. Previews therefore always match the design system version in use.
+
 ### Tests
 
 The integration tests run the real Kotlin completion and inlay hint passes against the bundled
@@ -195,7 +224,7 @@ Kotlin plugin, so they catch contributor-ordering regressions. They check, for e
 `EsdsTheme.icon.si<caret>` renders `sizeSm` with `20dp`, and that typing `16` into an open popup
 narrows it to `xl`. `PluginRegistrationTest` validates the `plugin.xml` wiring.
 `EsdsTokenNavigatorTest` runs the definition lookup against verbatim copies of the design system
-files.
+files, and `EsdsIconTest` reads and paints real compiled icons from `src/test/testData/esds-icons`.
 
 ## License
 

@@ -28,7 +28,8 @@ class EsdsTokenCompletionContributor : CompletionContributor() {
             return
         }
 
-        val category = EsdsTokenMatcher.detectCategoryBeforeCaret(text, parameters.offset) ?: return
+        val category = EsdsTokenMatcher.detectCategoryBeforeCaret(text, parameters.offset)
+            ?: return decorateIcons(parameters, result, text)
 
         // The popup opened on `EsdsTheme.spacing.` only holds names, which a digit can never match.
         // Restarting on digits lets the branch above take over instead of the popup closing.
@@ -39,6 +40,24 @@ class EsdsTokenCompletionContributor : CompletionContributor() {
         result.runRemainingContributors(parameters) { completionResult ->
             val decorated = EsdsLookupDecorator.decorate(completionResult.lookupElement, category)
             result.passResult(completionResult.withLookupElement(decorated))
+        }
+    }
+
+    /** Previews after `EsdsIcons.Medium.`, and the size of each category (`24dp`) after `EsdsIcons.`. */
+    private fun decorateIcons(parameters: CompletionParameters, result: CompletionResultSet, text: CharSequence) {
+        val project = parameters.position.project
+        val iconSize = EsdsIconMatcher.detectSizeOfIconBeforeCaret(text, parameters.offset)
+        if (iconSize == null && !EsdsIconMatcher.isCompletingSize(text, parameters.offset)) return
+
+        result.runRemainingContributors(parameters) { completionResult ->
+            val element = completionResult.lookupElement
+            val decorated = if (iconSize != null) {
+                EsdsIconRepository.icon(project, iconSize, element.lookupString)
+                    ?.let { EsdsLookupDecorator.withValue(element, value = null, icon = it.Preview(16)) }
+            } else {
+                EsdsIconRepository.sizeLabel(project, element.lookupString)?.let { EsdsLookupDecorator.withValue(element, it) }
+            }
+            result.passResult(completionResult.withLookupElement(decorated ?: element))
         }
     }
 }

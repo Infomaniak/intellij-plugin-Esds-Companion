@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0
+
+- Icon previews: `EsdsIcons.Medium.Plus` is previewed in code completion and in the gutter. Icons are
+  read from the design system the project depends on, so they always match its version.
+- Completing `EsdsIcons.` shows the size each category is designed for (`Medium` is `24dp`).
+- New *Settings | Tools | Esds Companion* page to pick the preview color. Previews follow the editor
+  text color by default.
+
 ## 2.1.0
 
 - Support `EsdsTheme.opacity` tokens. Values are shown as percentages: `EsdsTheme.opacity.ghost`

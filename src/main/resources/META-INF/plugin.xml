@@ -7,7 +7,7 @@
     <description><![CDATA[
         Companion for the <a href="https://github.com/Infomaniak/android-design-system">Infomaniak
         Android design system</a> (ESDS): see the real value behind dimension and opacity tokens while you write
-        Kotlin.
+        Kotlin, and preview design system icons.
         <ul>
             <li><b>Completion shows values</b>: <code>EsdsTheme.icon.sizeSm</code> displays
                 <code>20dp</code> instead of the uninformative <code>Dp</code> type.</li>
@@ -16,6 +16,10 @@
             <li><b>Inlay hints</b> show the value next to each call site. Turn them off under
                 <i>Settings | Editor | Inlay Hints | Values</i>.</li>
             <li><b>Ctrl/Cmd-click a hint</b> to open the design system file defining the token.</li>
+            <li><b>Icon previews</b>: <code>EsdsIcons.Medium.Plus</code> is previewed in completion and in the
+                gutter, and completing <code>EsdsIcons.</code> shows the size each category is meant for
+                (<code>Medium</code> is <code>24dp</code>). The preview color can be changed under
+                <i>Settings | Tools | Esds Companion</i>.</li>
         </ul>
         Covers <code>icon</code>, <code>spacing</code>, <code>radius</code> and <code>opacity</code> tokens, on
         <code>EsdsTheme</code> as well as per-app themes such as <code>MailTheme</code>.
@@ -58,5 +62,17 @@
         <codeInsight.inlayActionHandler
                 handlerId="com.infomaniak.esdscompanion.navigateToToken"
                 implementationClass="com.infomaniak.esdscompanion.EsdsTokenNavigationHandler"/>
+
+        <!-- Icon previews in the gutter, toggleable under Settings | Editor | General | Gutter Icons. -->
+        <codeInsight.lineMarkerProvider
+                language="kotlin"
+                implementationClass="com.infomaniak.esdscompanion.EsdsIconLineMarkerProvider"/>
+
+        <applicationConfigurable
+                parentId="tools"
+                id="com.infomaniak.esdscompanion"
+                bundle="messages.EsdsCompanionBundle"
+                key="settings.displayName"
+                instance="com.infomaniak.esdscompanion.EsdsCompanionConfigurable"/>
     </extensions>
 </idea-plugin>
