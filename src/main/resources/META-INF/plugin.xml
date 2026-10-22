@@ -18,7 +18,8 @@
             <li><b>Ctrl/Cmd-click a hint</b> to open the design system file defining the token.</li>
             <li><b>Icon previews</b>: <code>EsdsIcons.Plus.Medium</code> is previewed in completion and in the
                 gutter, and completing <code>EsdsIcons.Plus.</code> shows each size with what it is meant for
-                (<code>Medium</code> is <code>24dp</code>). The preview color can be changed under
+                (<code>Medium</code> is <code>24dp</code>), also shown as an inlay hint after
+                <code>EsdsIcons.Plus.Small</code> or any <code>Symbol</code>'s <code>.Small</code>. The preview color can be changed under
                 <i>Settings | Tools | Esds Companion</i>.</li>
         </ul>
         Covers <code>icon</code>, <code>spacing</code>, <code>radius</code> and <code>opacity</code> tokens, on
@@ -57,6 +58,16 @@
                 nameKey="inlay.esdsTokenValues.name"
                 descriptionKey="inlay.esdsTokenValues.description"
                 implementationClass="com.infomaniak.esdscompanion.EsdsTokenInlayHintsProvider"/>
+
+        <codeInsight.declarativeInlayProvider
+                language="kotlin"
+                providerId="com.infomaniak.esdscompanion.iconSizes"
+                group="VALUES_GROUP"
+                isEnabledByDefault="true"
+                bundle="messages.EsdsCompanionBundle"
+                nameKey="inlay.esdsIconSizes.name"
+                descriptionKey="inlay.esdsIconSizes.description"
+                implementationClass="com.infomaniak.esdscompanion.EsdsIconSizeInlayHintsProvider"/>
 
         <!-- Makes the inlay hints clickable: jumps to the design system source. -->
         <codeInsight.inlayActionHandler

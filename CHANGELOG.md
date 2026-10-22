@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.0
+
+- New inlay hint showing the dp size of a sized icon: `EsdsIcons.Plus.Small` displays `20dp`. It works
+  on any `Symbol`, such as `icon.Large` with `icon: Symbol`. On by default, under *Settings | Editor |
+  Inlay Hints | Values*.
+
 ## 2.3.0
 
 - Follow the design system's new icon API, `EsdsIcons.Plus.Medium`. Completing `EsdsIcons.` previews

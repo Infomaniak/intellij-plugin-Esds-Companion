@@ -25,6 +25,13 @@ internal object EsdsIconRepository {
         return file?.let { read(it, name) }
     }
 
+    /** The size every icon of [size] (`Small`) is designed for, such as `20dp`. */
+    fun sizeLabel(project: Project, size: String): String? {
+        val sizeDirectory = iconsDirectory(project)?.findFileByRelativePath("imagevector/${size.lowercase()}") ?: return null
+        val anyIcon = sizeDirectory.children.firstOrNull { it.name.endsWith("Kt.class") } ?: return null
+        return read(anyIcon, anyIcon.name.removeSuffix("Kt.class"))?.sizeLabel
+    }
+
     private fun read(file: VirtualFile, name: String): EsdsIconVector? =
         cache[file.url] ?: runCatching { file.contentsToByteArray() }.getOrNull()
             ?.let { EsdsIconVector.read(it, name) }

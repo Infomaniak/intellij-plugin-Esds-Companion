@@ -68,6 +68,16 @@ The gutter shows the icon on every line using it. `EsdsIcons.Plus` and `EsdsIcon
 are previewed at the default `Medium` size, since a `CompositionLocal` override can't be known
 before runtime.
 
+An inlay hint shows the size of each sized icon, whether written `EsdsIcons.Plus.Small` or reached
+through any `Symbol` (`icon.Small` with `icon: Symbol`):
+
+```kotlin
+Icon(EsdsIcons.Plus.Small 20dp, contentDescription = null)
+```
+
+It is on by default and can be turned off under **Settings → Editor → Inlay Hints → Values →
+_Infomaniak design system icon sizes_**.
+
 Previews use the editor text color, whatever the icon's own color is. To pick another one, go to
 **Settings → Tools → Esds Companion**. Gutter previews can be turned off under **Settings → Editor →
 General → Gutter Icons**.
@@ -220,6 +230,10 @@ sized getter, such as the internal `EsdsIcons.Medium.Plus` behind `EsdsIcons.Plu
 `ImageVector.Builder` and `PathBuilder` calls with constant arguments. `EsdsIconVector` reads that
 bytecode with the ASM copy bundled in the platform, replays the path commands onto a Java2D `Path2D`
 and paints it. Previews therefore always match the design system version in use.
+
+`EsdsIconSizeInlayHintsProvider` resolves each `.Small`-like selector and only keeps those declared
+in an interface named `Symbol`, so an unrelated `TextSize.Small` gets no hint. The dp size is read
+from any icon compiled at that size.
 
 ### Tests
 

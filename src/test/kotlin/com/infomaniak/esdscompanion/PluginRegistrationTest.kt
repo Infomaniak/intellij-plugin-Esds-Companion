@@ -30,27 +30,28 @@ class PluginRegistrationTest {
     }
 
     @Test
-    fun `inlay hints provider is registered and on by default`() {
-        val registration = extension("codeInsight.declarativeInlayProvider")
-
-        assertEquals("kotlin", registration.attribute("language"))
-        assertEquals("true", registration.attribute("isEnabledByDefault"))
-        assertClassExists(registration.attribute("implementationClass"))
+    fun `inlay hints providers are registered and on by default`() {
+        for (registration in extensions("codeInsight.declarativeInlayProvider")) {
+            assertEquals("kotlin", registration.attribute("language"))
+            assertEquals("true", registration.attribute("isEnabledByDefault"))
+            assertClassExists(registration.attribute("implementationClass"))
+        }
     }
 
     @Test
     fun `inlay hints settings labels resolve to real bundle entries`() {
-        val registration = extension("codeInsight.declarativeInlayProvider")
-        val bundlePath = registration.attribute("bundle").replace('.', '/') + ".properties"
+        for (registration in extensions("codeInsight.declarativeInlayProvider")) {
+            val bundlePath = registration.attribute("bundle").replace('.', '/') + ".properties"
 
-        val bundle = checkNotNull(javaClass.getResourceAsStream("/$bundlePath")) {
-            "Bundle $bundlePath is missing"
-        }.use(::PropertyResourceBundle)
+            val bundle = checkNotNull(javaClass.getResourceAsStream("/$bundlePath")) {
+                "Bundle $bundlePath is missing"
+            }.use(::PropertyResourceBundle)
 
-        for (key in listOf("nameKey", "descriptionKey")) {
-            val resourceKey = registration.attribute(key)
-            assertTrue(bundle.containsKey(resourceKey), "Bundle has no entry for $key='$resourceKey'")
-            assertTrue(bundle.getString(resourceKey).isNotBlank(), "Empty bundle entry for '$resourceKey'")
+            for (key in listOf("nameKey", "descriptionKey")) {
+                val resourceKey = registration.attribute(key)
+                assertTrue(bundle.containsKey(resourceKey), "Bundle has no entry for $key='$resourceKey'")
+                assertTrue(bundle.getString(resourceKey).isNotBlank(), "Empty bundle entry for '$resourceKey'")
+            }
         }
     }
 
@@ -61,6 +62,10 @@ class PluginRegistrationTest {
         assertEquals(EsdsTokenNavigationHandler.HANDLER_ID, registration.attribute("handlerId"))
         assertClassExists(registration.attribute("implementationClass"))
     }
+
+    private fun extensions(name: String): List<String> =
+        Regex("""<$name\b[^>]*/>""", RegexOption.DOT_MATCHES_ALL).findAll(pluginXml).map { it.value }.toList()
+            .also { check(it.isNotEmpty()) { "No <$name> registration in plugin.xml" } }
 
     private fun extension(name: String): String {
         val tag = Regex("""<$name\b[^>]*/>""", RegexOption.DOT_MATCHES_ALL).find(pluginXml)
