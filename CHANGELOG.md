@@ -1,22 +1,15 @@
 # Changelog
 
-## 2.4.0
+## 2.2.0
 
+- Icon previews: `EsdsIcons.Plus` is previewed in code completion and in the gutter. Icons are read
+  from the design system the project depends on, so they always match its version.
+- Completing `EsdsIcons.` previews each icon at its default size (`Medium`); completing
+  `EsdsIcons.Plus.` previews each size next to the dp size it is designed for.
+- The gutter previews `EsdsIcons.Plus` and `EsdsIcons.Plus.current` at the default `Medium` size.
 - New inlay hint showing the dp size of a sized icon: `EsdsIcons.Plus.Small` displays `20dp`. It works
   on any `Symbol`, such as `icon.Large` with `icon: Symbol`. On by default, under *Settings | Editor |
   Inlay Hints | Values*.
-
-## 2.3.0
-
-- Follow the design system's new icon API, `EsdsIcons.Plus.Medium`. Completing `EsdsIcons.` previews
-  each icon at its default size; completing `EsdsIcons.Plus.` previews each size next to its dp size.
-- The gutter previews `EsdsIcons.Plus` and `EsdsIcons.Plus.current` at the default `Medium` size.
-
-## 2.2.0
-
-- Icon previews: `EsdsIcons.Medium.Plus` is previewed in code completion and in the gutter. Icons are
-  read from the design system the project depends on, so they always match its version.
-- Completing `EsdsIcons.` shows the size each category is designed for (`Medium` is `24dp`).
 - New *Settings | Tools | Esds Companion* page to pick the preview color. Previews follow the editor
   text color by default.
 
