@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Finds the design system icons compiled into the project's dependencies, such as
- * `com/infomaniak/designsystem/icons/imagevector/medium/PlusKt.class` for `EsdsIcons.Medium.Plus`.
+ * `com/infomaniak/designsystem/icons/imagevector/medium/PlusKt.class` for `EsdsIcons.Plus.Medium`.
  */
 internal object EsdsIconRepository {
 
@@ -19,16 +19,10 @@ internal object EsdsIconRepository {
     /** Keyed by class file URL, which includes the design system version. */
     private val cache = ConcurrentHashMap<String, EsdsIconVector>()
 
-    fun icon(project: Project, size: String, name: String): EsdsIconVector? {
+    /** Icon [name] (`Plus`) drawn at [size] (`Medium`), from the internal `EsdsIcons.Medium.Plus` getter. */
+    fun icon(project: Project, name: String, size: String): EsdsIconVector? {
         val file = iconsDirectory(project)?.findFileByRelativePath("imagevector/${size.lowercase()}/${name}Kt.class")
         return file?.let { read(it, name) }
-    }
-
-    /** The size every icon of [size] (`Medium`) is designed for, such as `24dp`. */
-    fun sizeLabel(project: Project, size: String): String? {
-        val sizeDirectory = iconsDirectory(project)?.findFileByRelativePath("imagevector/${size.lowercase()}") ?: return null
-        val anyIcon = sizeDirectory.children.firstOrNull { it.name.endsWith("Kt.class") } ?: return null
-        return read(anyIcon, anyIcon.name.removeSuffix("Kt.class"))?.sizeLabel
     }
 
     private fun read(file: VirtualFile, name: String): EsdsIconVector? =

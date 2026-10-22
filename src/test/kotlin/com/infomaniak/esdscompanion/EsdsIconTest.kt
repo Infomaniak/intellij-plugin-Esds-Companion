@@ -23,12 +23,23 @@ class EsdsIconTest : BasePlatformTestCase() {
         // the test IDE, so completion runs against sources; previews still come from the class files.
         myFixture.addFileToProject(
             "EsdsIcons.kt",
-            "package com.infomaniak.designsystem.icons\nobject EsdsIcons { object ExtraSmall; object Medium }",
+            """
+            package com.infomaniak.designsystem.icons
+            object EsdsIcons
+            sealed interface Symbol {
+                val ExtraSmall: Any
+                val Small: Any
+                val Medium: Any
+                val Large: Any
+                val ExtraLarge: Any
+                val current: Any
+            }
+            """.trimIndent(),
         )
         myFixture.addFileToProject(
             "Plus.kt",
-            "package com.infomaniak.designsystem.icons.imagevector.medium\n" +
-                "import com.infomaniak.designsystem.icons.EsdsIcons\nval EsdsIcons.Medium.Plus: Any get() = TODO()",
+            "package com.infomaniak.designsystem.icons.symbols\n" +
+                "import com.infomaniak.designsystem.icons.*\nval EsdsIcons.Plus: Symbol get() = TODO()",
         )
     }
 
@@ -54,35 +65,47 @@ class EsdsIconTest : BasePlatformTestCase() {
         assertEquals(0, image.getRGB(1, 1))
     }
 
-    fun `test completing an icon shows its preview`() {
-        myFixture.configureByText("Screen.kt", "$IMPORT\nfun screen() { EsdsIcons.Medium.<caret> }")
+    private fun completeAndRender(code: String): Map<String, LookupElementPresentation> {
+        myFixture.configureByText("Screen.kt", "$IMPORT\n$code")
         myFixture.completeBasic()
-
-        val plus = myFixture.lookupElements.orEmpty().first { it.lookupString == "Plus" }
-        val icon = LookupElementPresentation().also(plus::renderElement).icon
-        assertEquals("24dp", (icon as EsdsIconVector.Preview).vector.sizeLabel)
+        return myFixture.lookupElements.orEmpty().associate {
+            it.lookupString to LookupElementPresentation().also(it::renderElement)
+        }
     }
 
-    fun `test completing a size category shows its icon size`() {
-        myFixture.configureByText("Screen.kt", "$IMPORT\nfun screen() { EsdsIcons.<caret> }")
-        myFixture.completeBasic()
+    private val LookupElementPresentation.previewSize get() = (icon as? EsdsIconVector.Preview)?.vector?.sizeLabel
 
-        val rendered = myFixture.lookupElements.orEmpty().associate {
-            it.lookupString to LookupElementPresentation().also(it::renderElement).typeText
-        }
-        assertEquals("24dp", rendered["Medium"])
-        assertEquals("16dp", rendered["ExtraSmall"])
+    fun `test completing an icon previews it at the default size`() {
+        val rendered = completeAndRender("fun screen() { EsdsIcons.<caret> }")
+
+        assertEquals("24dp", rendered.getValue("Plus").previewSize)
+    }
+
+    fun `test completing a size shows its preview and dp size`() {
+        val rendered = completeAndRender("fun screen() { EsdsIcons.Plus.<caret> }")
+
+        assertEquals("24dp", rendered.getValue("Medium").typeText)
+        assertEquals("24dp", rendered.getValue("Medium").previewSize)
+        assertEquals("16dp", rendered.getValue("ExtraSmall").typeText)
+        assertEquals("16dp", rendered.getValue("ExtraSmall").previewSize)
+        assertNull(rendered.getValue("current").previewSize)
     }
 
     fun `test icons used in code get a gutter preview`() {
-        myFixture.configureByText("Screen.kt", "$IMPORT\nval icon = EsdsIcons.Medium.Plus\nval other = EsdsIcons.Medium")
+        myFixture.configureByText(
+            "Screen.kt",
+            "$IMPORT\nval a = EsdsIcons.Plus.ExtraSmall\nval b = EsdsIcons.Plus\nval c = EsdsIcons.Plus.current",
+        )
 
         val tooltips = myFixture.findAllGutters().filter { it.icon is EsdsIconVector.Preview }.map { it.tooltipText }
-        assertEquals(listOf("EsdsIcons.Medium.Plus · 24dp"), tooltips)
+        assertEquals(
+            listOf("EsdsIcons.Plus.ExtraSmall · 16dp", "EsdsIcons.Plus.Medium · 24dp", "EsdsIcons.Plus.Medium · 24dp"),
+            tooltips,
+        )
     }
 
     private companion object {
         const val ICONS_ROOT = "src/test/testData/esds-icons"
-        const val IMPORT = "import com.infomaniak.designsystem.icons.EsdsIcons\n"
+        const val IMPORT = "import com.infomaniak.designsystem.icons.EsdsIcons\nimport com.infomaniak.designsystem.icons.symbols.Plus\n"
     }
 }

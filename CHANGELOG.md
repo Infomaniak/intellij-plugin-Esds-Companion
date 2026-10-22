@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0
+
+- Follow the design system's new icon API, `EsdsIcons.Plus.Medium`. Completing `EsdsIcons.` previews
+  each icon at its default size; completing `EsdsIcons.Plus.` previews each size next to its dp size.
+- The gutter previews `EsdsIcons.Plus` and `EsdsIcons.Plus.current` at the default `Medium` size.
+
 ## 2.2.0
 
 - Icon previews: `EsdsIcons.Medium.Plus` is previewed in code completion and in the gutter. Icons are

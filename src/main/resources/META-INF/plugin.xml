@@ -16,8 +16,8 @@
             <li><b>Inlay hints</b> show the value next to each call site. Turn them off under
                 <i>Settings | Editor | Inlay Hints | Values</i>.</li>
             <li><b>Ctrl/Cmd-click a hint</b> to open the design system file defining the token.</li>
-            <li><b>Icon previews</b>: <code>EsdsIcons.Medium.Plus</code> is previewed in completion and in the
-                gutter, and completing <code>EsdsIcons.</code> shows the size each category is meant for
+            <li><b>Icon previews</b>: <code>EsdsIcons.Plus.Medium</code> is previewed in completion and in the
+                gutter, and completing <code>EsdsIcons.Plus.</code> shows each size with what it is meant for
                 (<code>Medium</code> is <code>24dp</code>). The preview color can be changed under
                 <i>Settings | Tools | Esds Companion</i>.</li>
         </ul>

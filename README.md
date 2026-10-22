@@ -52,17 +52,21 @@ sources* and re-sync.
 
 ### Icon previews
 
-`EsdsIcons.Medium.Plus` is previewed in the completion popup and in the gutter of every line using
-it. Completing `EsdsIcons.` shows the size each category is designed for:
+Completing `EsdsIcons.` previews every icon at its default size (`Medium`). Completing
+`EsdsIcons.Plus.` previews the icon at each size, next to the size it is designed for:
 
 ```
-EsdsIcons.|
-          ExtraSmall  16dp
-          Small       20dp
-          Medium      24dp
-          Large       32dp
-          ExtraLarge  40dp
+EsdsIcons.Plus.|
+               ＋ ExtraSmall  16dp
+               ＋ Small       20dp
+               ＋ Medium      24dp
+               ＋ Large       32dp
+               ＋ ExtraLarge  40dp
 ```
+
+The gutter shows the icon on every line using it. `EsdsIcons.Plus` and `EsdsIcons.Plus.current`
+are previewed at the default `Medium` size, since a `CompositionLocal` override can't be known
+before runtime.
 
 Previews use the editor text color, whatever the icon's own color is. To pick another one, go to
 **Settings → Tools → Esds Companion**. Gutter previews can be turned off under **Settings → Editor →
@@ -212,7 +216,7 @@ detected.
 #### Icon previews
 
 Nothing is bundled or scraped: each icon is read from the design system the project depends on. Its
-getter, such as `EsdsIcons.Medium.Plus`, compiles to a flat sequence of fully inlined
+sized getter, such as the internal `EsdsIcons.Medium.Plus` behind `EsdsIcons.Plus.Medium`, compiles to a flat sequence of fully inlined
 `ImageVector.Builder` and `PathBuilder` calls with constant arguments. `EsdsIconVector` reads that
 bytecode with the ASM copy bundled in the platform, replays the path commands onto a Java2D `Path2D`
 and paints it. Previews therefore always match the design system version in use.

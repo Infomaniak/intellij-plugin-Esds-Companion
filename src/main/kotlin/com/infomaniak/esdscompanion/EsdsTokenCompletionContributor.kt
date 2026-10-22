@@ -43,19 +43,21 @@ class EsdsTokenCompletionContributor : CompletionContributor() {
         }
     }
 
-    /** Previews after `EsdsIcons.Medium.`, and the size of each category (`24dp`) after `EsdsIcons.`. */
+    /** Default size previews after `EsdsIcons.`, then each size's preview and dp size after `EsdsIcons.Plus.`. */
     private fun decorateIcons(parameters: CompletionParameters, result: CompletionResultSet, text: CharSequence) {
         val project = parameters.position.project
-        val iconSize = EsdsIconMatcher.detectSizeOfIconBeforeCaret(text, parameters.offset)
-        if (iconSize == null && !EsdsIconMatcher.isCompletingSize(text, parameters.offset)) return
+        val icon = EsdsIconMatcher.detectIconBeforeCaret(text, parameters.offset)
+        if (icon == null && !EsdsIconMatcher.isCompletingIcon(text, parameters.offset)) return
 
         result.runRemainingContributors(parameters) { completionResult ->
             val element = completionResult.lookupElement
-            val decorated = if (iconSize != null) {
-                EsdsIconRepository.icon(project, iconSize, element.lookupString)
-                    ?.let { EsdsLookupDecorator.withValue(element, value = null, icon = it.Preview(16)) }
+            val decorated = if (icon != null) {
+                element.lookupString.takeIf { it in EsdsIconMatcher.SIZES }
+                    ?.let { size -> EsdsIconRepository.icon(project, icon, size) }
+                    ?.let { EsdsLookupDecorator.withValue(element, it.sizeLabel, it.Preview(16)) }
             } else {
-                EsdsIconRepository.sizeLabel(project, element.lookupString)?.let { EsdsLookupDecorator.withValue(element, it) }
+                EsdsIconRepository.icon(project, element.lookupString, EsdsIconMatcher.DEFAULT_SIZE)
+                    ?.let { EsdsLookupDecorator.withValue(element, value = null, icon = it.Preview(16)) }
             }
             result.passResult(completionResult.withLookupElement(decorated ?: element))
         }

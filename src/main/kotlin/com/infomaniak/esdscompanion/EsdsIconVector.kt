@@ -30,7 +30,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 /**
- * The drawing of a design system icon such as `EsdsIcons.Medium.Plus`, drawn for [widthDp] (24dp).
+ * The drawing of a design system icon such as `EsdsIcons.Plus.Medium`, drawn for [widthDp] (24dp).
  *
  * It is read back from the icon's *compiled* getter, which is always on the project's classpath,
  * unlike sources. The generated `ImageVector.Builder { path { moveTo(5f, 12f) ... } }` code is fully
