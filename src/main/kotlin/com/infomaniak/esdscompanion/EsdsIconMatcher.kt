@@ -1,5 +1,8 @@
 package com.infomaniak.esdscompanion
 
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
+
 /**
  * Recognises references to design system icons, such as `EsdsIcons.Plus.Medium`.
  *
@@ -34,6 +37,9 @@ internal object EsdsIconMatcher {
 
     private val WHITESPACE = Regex("""\s+""")
 
+    /** `receiver . partiallyTypedMember`, ending exactly at the caret. */
+    private val MEMBER_PREFIX_REGEX = Regex("""\.\s*\w*$""")
+
     /** An icon reference: `name` is the icon (`Plus`), `size` the size it is drawn at (`Medium`). */
     data class IconReference(val name: String, val size: String)
 
@@ -61,6 +67,17 @@ internal object EsdsIconMatcher {
             else -> null
         }
     }
+
+    /** Whether the caret is completing a member, as in `symbol.`, whatever the receiver. */
+    fun isCompletingMember(fileText: CharSequence, caretOffset: Int): Boolean =
+        tailBeforeCaret(fileText, caretOffset)?.let(MEMBER_PREFIX_REGEX::containsMatchIn) == true
+
+    /** Whether [declaration] is one of the sizes declared by the `Symbol` interface, such as `Symbol.Small`. */
+    fun isSymbolSize(declaration: PsiElement?): Boolean =
+        (declaration as? PsiNamedElement)?.name in SIZES &&
+            (declaration?.parent?.parent as? PsiNamedElement)?.name == SYMBOL_INTERFACE
+
+    private const val SYMBOL_INTERFACE = "Symbol"
 
     private fun tailBeforeCaret(fileText: CharSequence, caretOffset: Int): CharSequence? {
         if (caretOffset <= 0 || caretOffset > fileText.length) return null

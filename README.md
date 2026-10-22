@@ -64,6 +64,9 @@ EsdsIcons.Plus.|
                ＋ ExtraLarge  40dp
 ```
 
+Completing the sizes of any other `Symbol` (`symbol.` with `symbol: Symbol`) shows the dp sizes too,
+without previews since the icon is only known at runtime.
+
 The gutter shows the icon on every line using it. `EsdsIcons.Plus` and `EsdsIcons.Plus.current`
 are previewed at the default `Medium` size, since a `CompositionLocal` override can't be known
 before runtime.

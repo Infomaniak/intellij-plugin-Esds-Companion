@@ -9,7 +9,6 @@ import com.intellij.codeInsight.hints.declarative.SharedBypassCollector
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiNamedElement
 
 /**
  * Shows the size of an icon next to `EsdsIcons.Plus.Small`, or `icon.Small` on any `Symbol`: `20dp`.
@@ -30,8 +29,7 @@ internal class EsdsIconSizeInlayHintsProvider : InlayHintsProvider {
             if (qualified.lastChild != element || qualified.node?.elementType?.toString() != "DOT_QUALIFIED_EXPRESSION") return
 
             // Resolving tells `symbol.Small` apart from an unrelated `TextSize.Small`, whatever the receiver.
-            val declaration = element.references.firstNotNullOfOrNull { it.resolve() } ?: return
-            if ((declaration.parent?.parent as? PsiNamedElement)?.name != SYMBOL_INTERFACE) return
+            if (!EsdsIconMatcher.isSymbolSize(element.references.firstNotNullOfOrNull { it.resolve() })) return
 
             val label = EsdsIconRepository.sizeLabel(element.project, size) ?: return
             sink.addPresentation(
@@ -41,10 +39,5 @@ internal class EsdsIconSizeInlayHintsProvider : InlayHintsProvider {
                 text(label)
             }
         }
-    }
-
-    private companion object {
-        /** `Symbol`, declaring `val Small: ImageVector` and the other sizes. */
-        const val SYMBOL_INTERFACE = "Symbol"
     }
 }

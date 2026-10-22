@@ -43,11 +43,17 @@ class EsdsTokenCompletionContributor : CompletionContributor() {
         }
     }
 
-    /** Default size previews after `EsdsIcons.`, then each size's preview and dp size after `EsdsIcons.Plus.`. */
+    /**
+     * Default size previews after `EsdsIcons.`, then each size's preview and dp size after `EsdsIcons.Plus.`.
+     * After any other `symbol.`, sizes declared by `Symbol` only get their dp size: the icon is unknown.
+     */
     private fun decorateIcons(parameters: CompletionParameters, result: CompletionResultSet, text: CharSequence) {
         val project = parameters.position.project
         val icon = EsdsIconMatcher.detectIconBeforeCaret(text, parameters.offset)
-        if (icon == null && !EsdsIconMatcher.isCompletingIcon(text, parameters.offset)) return
+        if (icon == null && !EsdsIconMatcher.isCompletingIcon(text, parameters.offset)) {
+            if (EsdsIconMatcher.isCompletingMember(text, parameters.offset)) decorateSymbolSizes(parameters, result)
+            return
+        }
 
         result.runRemainingContributors(parameters) { completionResult ->
             val element = completionResult.lookupElement
@@ -59,6 +65,18 @@ class EsdsTokenCompletionContributor : CompletionContributor() {
                 EsdsIconRepository.icon(project, element.lookupString, EsdsIconMatcher.DEFAULT_SIZE)
                     ?.let { EsdsLookupDecorator.withValue(element, value = null, icon = it.Preview(16)) }
             }
+            result.passResult(completionResult.withLookupElement(decorated ?: element))
+        }
+    }
+
+    private fun decorateSymbolSizes(parameters: CompletionParameters, result: CompletionResultSet) {
+        val project = parameters.position.project
+        result.runRemainingContributors(parameters) { completionResult ->
+            val element = completionResult.lookupElement
+            // Checking the name first keeps the PSI lookup off the hundreds of other members.
+            val decorated = element.takeIf { it.lookupString in EsdsIconMatcher.SIZES && EsdsIconMatcher.isSymbolSize(it.psiElement) }
+                ?.let { EsdsIconRepository.sizeLabel(project, it.lookupString) }
+                ?.let { EsdsLookupDecorator.withValue(element, it) }
             result.passResult(completionResult.withLookupElement(decorated ?: element))
         }
     }

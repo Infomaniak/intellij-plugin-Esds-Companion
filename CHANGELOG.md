@@ -5,7 +5,8 @@
 - Icon previews: `EsdsIcons.Plus` is previewed in code completion and in the gutter. Icons are read
   from the design system the project depends on, so they always match its version.
 - Completing `EsdsIcons.` previews each icon at its default size (`Medium`); completing
-  `EsdsIcons.Plus.` previews each size next to the dp size it is designed for.
+  `EsdsIcons.Plus.` previews each size next to the dp size it is designed for. Completing the sizes of
+  any `Symbol` variable shows the dp sizes too.
 - The gutter previews `EsdsIcons.Plus` and `EsdsIcons.Plus.current` at the default `Medium` size.
 - New inlay hint showing the dp size of a sized icon: `EsdsIcons.Plus.Small` displays `20dp`. It works
   on any `Symbol`, such as `icon.Large` with `icon: Symbol`. On by default, under *Settings | Editor |

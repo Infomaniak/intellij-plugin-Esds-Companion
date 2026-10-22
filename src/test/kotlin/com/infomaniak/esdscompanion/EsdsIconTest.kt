@@ -91,6 +91,23 @@ class EsdsIconTest : BasePlatformTestCase() {
         assertNull(rendered.getValue("current").previewSize)
     }
 
+    fun `test completing a size on any Symbol shows its dp size`() {
+        val rendered = completeAndRender(
+            "import com.infomaniak.designsystem.icons.Symbol\nenum class TextSize { Small }\n" +
+                "fun screen(symbol: Symbol) { symbol.<caret> }",
+        )
+
+        assertEquals("24dp", rendered.getValue("Medium").typeText)
+        assertEquals("40dp", rendered.getValue("ExtraLarge").typeText)
+        assertNull(rendered.getValue("current").typeText?.takeIf { it.endsWith("dp") })
+    }
+
+    fun `test completing an unrelated Small keeps its type`() {
+        val rendered = completeAndRender("enum class TextSize { Small }\nfun screen() { TextSize.<caret> }")
+
+        assertFalse(rendered.getValue("Small").typeText.orEmpty().endsWith("dp"))
+    }
+
     fun `test icons used in code get a gutter preview`() {
         myFixture.configureByText(
             "Screen.kt",
